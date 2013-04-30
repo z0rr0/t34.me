@@ -4,4 +4,6 @@
 ADMIN = "admin@t34.me"
 DEBUG = True
 
-print("a")
+ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+
