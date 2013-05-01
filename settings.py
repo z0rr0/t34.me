@@ -23,6 +23,8 @@ SIMPLE_ALPHABET = '0123456789abcdefghijkmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ'
 MIN_ID = 100
 # waiting of unclock, seconds
 MAX_WAITING_LOCK = 20
+# max attemps free-add url
+FREE_ATTEMPS = 3
 
 # rewrite global setting vars
 try:
@@ -36,8 +38,8 @@ except ImportError:
 #      "hash": "4a8a9fc31dc15a4b87bb145b05db3ae0bf2333e4"   # url sha1 hash
 #     "full": "http://yandex.ru",                           # url
 #     "counter": 2,                                         # increment counter of requests
-#     "created": date1,
-#     "modified": date2,
+#     "created": date1,                                     # creation datetime
+#     "lastreq": date2,                                     # last request datetime
 # }
 # db.urls.ensureIndex({"hash": 1}, {"unique": 1})
 # db.urls.ensureIndex({"created": 1, "modified": 1})
