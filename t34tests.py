@@ -47,7 +47,23 @@ def test_urlobj():
         return
     print("Test '{0}' is passed".format(test_name))
 
+def test_locks():
+    test_name = "test_locks"
+    print("\nTest '{0}' is started...".format(test_name))
+    obj = t34methods.t34Url()
+    try:
+        obj.lock(True)
+        if settings.DEBUG:
+            print(obj.locks.find_one())
+        obj.lock(False)
+        assert(obj.locks.find_one() == None)
+    except (AssertionError,) as e:
+        print(e, "Test '{0}' is not passed".format(test_name))
+        return
+    print("Test '{0}' is passed".format(test_name))
+
 if __name__ == '__main__':
     test_converter(2)
     test_mongo()
     test_urlobj()
+    test_locks()

@@ -2,7 +2,8 @@
 #-*- coding: utf-8 -*-
 
 # This file contains base methods
-import settings, datetime, re, pymongo, hashlib
+import settings, datetime, time, pymongo, hashlib, random, threading
+# import threading, re
 
 t34dict = settings.ALPHABET
 # t34dict = settings.SIMPLE_ALPHABET
@@ -141,6 +142,7 @@ class t34Url(t34Base):
 
     def get_data(self):
         self.col = self.db.urls
+        self.locks = self.db.locks
         if self.id:
             self.data = self.col.find_one({"_id": self.id})
 
@@ -151,10 +153,27 @@ class t34Url(t34Base):
         if obj:
             self.id, self.data = obj["_id"], obj
         else:
+            lock_key = hreading.currentThread().indent
             # threading.currentThread().indent
             now = datetime.datetime.utcnow()
 
-
+    def lock(self, state=False):
+        """state: True - lock, False - unlock"""
+        now = datetime.datetime.utcnow
+        end_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=settings.MAX_WAITING_LOCK)
+        thread = threading.currentThread().ident
+        if state:
+            while (now() < end_time):
+                try:
+                    lock = self.locks.insert({"_id": 1, "thread": thread, "status": now()})
+                    if lock: return True
+                except (pymongo.errors.DuplicateKeyError,) as e:
+                    # print(e)
+                    time.sleep(0.5 + random.random())
+            return False
+        else:
+            self.locks.remove({"thread": thread})
+        return True
 
     def get_max(self):
         max_val = self.col.aggregate({"$group": {"_id": "max", "val": {"$max": "$_id"}}})
