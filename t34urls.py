@@ -10,7 +10,7 @@ MEDIA = os.path.join(settings.PROJECT_PATH, 'media')
 
 @bottle.get('/')
 def index():
-    return bottle.template('index')
+    return bottle.template('index', content="Ok")
 
 @bottle.route('/<name:re:[0-9a-zA-Z]+>')
 def index2(name='World'):
