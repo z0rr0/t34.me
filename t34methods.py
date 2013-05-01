@@ -147,6 +147,10 @@ class t34Url(t34Base):
             if self.id:
                 self.data = self.col.find_one({"_id": self.id})
 
+    def refresh(self):
+        if self.db and self.id:
+            self.data = self.col.find_one({"_id": self.id})
+
     def create(self, fullUrl):
         if self.create_free(fullUrl):
             return t34_encode(self.id)
@@ -249,3 +253,11 @@ class t34Url(t34Base):
                 return min_val
         else:
             raise t34GenExt()
+
+    def update(self):
+        if self:
+            result = self.col.update({"_id": self.id}, {"$set": {"lastreq": datetime.datetime.utcnow()}, "$inc": {"counter": 1}})
+            if result["updatedExisting"]:
+                self.refresh()
+                return True
+        return False

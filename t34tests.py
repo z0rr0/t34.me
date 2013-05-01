@@ -115,6 +115,49 @@ def test_obj_deletion():
     print("Test '{0}' is passed".format(test_name))
     return 0
 
+def test_double_create():
+    test_name = "test_double_create"
+    print("\nTest '{0}' is started...".format(test_name))
+    test_url = "http://t34.me"
+    obj = t34methods.t34Url()
+    try:
+        assert(obj.db is not None)
+        result1 = obj.create(test_url)
+        assert(result1 == "a")
+        result2 = obj.create(test_url)
+        assert(result2 == "a")
+        if settings.DEBUG:
+            print(obj.data)
+        assert(obj.delete(None, None, test_url) == True)
+    except (AssertionError,) as e:
+        print(e, "Test '{0}' is not passed".format(test_name))
+        return 1
+    print("Test '{0}' is passed".format(test_name))
+    return 0
+
+def test_update_counter():
+    test_name = "test_update_counter"
+    print("\nTest '{0}' is started...".format(test_name))
+    test_url = "http://t34.me"
+    obj = t34methods.t34Url()
+    try:
+        assert(obj.db is not None)
+        result = obj.create(test_url)
+        assert(result == "a")
+        assert(obj.data["counter"] == 0)
+        assert(obj.update() == True)
+        for i in range(99):
+            obj.update()
+        assert(obj.data["counter"] == 100)
+        if settings.DEBUG:
+            print(obj.data)
+        assert(obj.delete(None, None, test_url) == True)
+    except (AssertionError,) as e:
+        print(e, "Test '{0}' is not passed".format(test_name))
+        return 1
+    print("Test '{0}' is passed".format(test_name))
+    return 0
+
 if __name__ == '__main__':
     total, er = 0, 0
     if test_converter(2):
@@ -133,6 +176,12 @@ if __name__ == '__main__':
         er += 1
     total += 1
     if test_obj_deletion():
+        er += 1
+    total += 1
+    if test_double_create():
+        er += 1
+    total += 1
+    if test_update_counter():
         er += 1
     total += 1
     print("\nThe test result: total={0}, with error={1}, passed={2}".format(total, er, total-er))
