@@ -38,9 +38,9 @@ def test_urlobj():
     print("\nTest '{0}' is started...".format(test_name))
     obj = t34methods.t34Url()
     try:
-        assert(str(obj) == "<t34Url: None>")
         if settings.DEBUG:
             print("{0}, get_max={1}".format(obj, obj.get_max()))
+        assert(str(obj) == "<t34: 0>")
     except (AssertionError,) as e:
         print(str(obj))
         print(e, "Test '{0}' is not passed".format(test_name))

@@ -86,8 +86,9 @@ def std_decode(x, basis):
 # ------------
 class t34Base(object):
     """docstring for t34Base"""
-    def __init__(self):
+    def __init__(self, shortID=None):
         self.db = None
+        self.id = 0 if not shortID else t34_decode(shortID)
         self.connection()
 
     def connection(self):
@@ -96,6 +97,37 @@ class t34Base(object):
             raise t34MongoEx()
         self.db = db
 
+    def __repr__(self):
+        return "<t34: {0}>".format(self.id)
+
+    def __str__(self):
+        return "<t34: {0}>".format(self.id)
+
+    def __bool__(self):
+        return bool(self.data)
+
+    def __lt__(self, other):
+        return self.id < other.id
+
+    def __le__(self, other):
+        return self.id <= other.id
+
+    def __gt__(self, other):
+        return self.id > other.id
+
+    def __ge__(self, other):
+        return self.id >= other.id
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
+
+    def __hash__(self):
+        return hash(id(self))
+
+
 class t34Url(t34Base):
     """
     It is a base class of t34.me
@@ -103,19 +135,9 @@ class t34Url(t34Base):
     shortID 1-100 are reserved for tests
     """
     def __init__(self, shortID=None):
-        super(t34Url, self).__init__()
+        super(t34Url, self).__init__(shortID)
         self.data = None
-        self.id = None if not shortID else t34_decode(shortID)
         self.get_data()
-
-    def __repr__(self):
-        return "<t34Url: {0}>".format(self.id)
-
-    def __str__(self):
-        return "<t34Url: {0}>".format(self.id)
-
-    def __bool__(self):
-        return bool(self.id)
 
     def get_data(self):
         self.col = self.db.urls
@@ -124,12 +146,23 @@ class t34Url(t34Base):
 
     def add(self, fullurl):
         """add new url to DB storage"""
-        hash = hashlib.sha1(fullurl.encode("utf-8")).hexdigest()
+        uhash = hashlib.sha1(fullurl.encode("utf-8")).hexdigest()
+        obj = self.col.find_one({"hash": uhash})
+        if obj:
+            self.id, self.data = obj["_id"], obj
+        else:
+            # threading.currentThread().indent
+            now = datetime.datetime.utcnow()
+
+
 
     def get_max(self):
         max_val = self.col.aggregate({"$group": {"_id": "max", "val": {"$max": "$_id"}}})
         if max_val["ok"]:
-            result = 100 if max_val["result"][0]["val"] < 100 else max_val["result"][0]["val"]
-            return int(result)
+            if max_val["result"]:
+                result = settings.MIN_ID if max_val["result"][0]["val"] < settings.MIN_ID else max_val["result"][0]["val"]
+                return int(result)
+            else:
+                return settings.MIN_ID
         else:
             raise t34GenExt()

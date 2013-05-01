@@ -19,6 +19,9 @@ PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 SIMPLE_ALPHABET = '0123456789abcdefghijkmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ'
 
+# id 1-99 are sererved for tests
+MIN_ID = 100
+
 # rewrite global setting vars
 try:
     from local_settings import *
