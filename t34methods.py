@@ -2,8 +2,7 @@
 #-*- coding: utf-8 -*-
 
 # This file contains base methods
-import settings, datetime, time, pymongo, hashlib, random, threading
-# import threading, re
+import settings, datetime, time, pymongo, hashlib, random, urllib, re
 
 t34dict = settings.ALPHABET
 # t34dict = settings.SIMPLE_ALPHABET
@@ -81,6 +80,28 @@ def std_decode(x, basis):
         result = int(str(x), basis)
         return result
     return None
+
+def url_prepare(link):
+    # for national domains
+    link = link.strip()
+    prefix = re.compile(r'^(.+)://', re.UNICODE)
+    try:
+        if not prefix.findall(link):
+            link = "http://" + link
+        templ = urllib.parse.urlparse(link)
+        q = urllib.parse.quote
+        new_url = {
+            "scheme": templ.scheme,
+            "netloc": templ.netloc.encode('idna').decode('utf-8'),
+            "path": q(templ.path, safe="%/:=&?~#+!$,;'@()*[]"),
+            "query": q(templ.query, safe="%/:=&?~#+!$,;'@()*[]"),
+            "params": q(templ.params, safe="%/:=&?~#+!$,;'@()*[]"),
+            "fragment": q(templ.fragment, safe="%/:=&?~#+!$,;'@()*[]"),
+        }
+        result = urllib.parse.urlunparse((new_url["scheme"], new_url["netloc"], new_url["path"], new_url["params"], new_url["query"], new_url["fragment"]))
+    except (Exception,) as e:
+        result = ""
+    return result
 
 # ------------
 # Classes
@@ -171,7 +192,7 @@ class t34Url(t34Base):
             try:
                 obj = {"_id": self.get_max(),
                     "hash": uhash, "full": fullUrl, "counter": 0,
-                    "created": now, "lastreq": now}
+                    "created": now, "lastreq": now, 'encfull': url_prepare(fullUrl)}
                 created = self.col.insert(obj)
                 if created:
                     self.id, self.data = obj["_id"], obj
@@ -196,7 +217,7 @@ class t34Url(t34Base):
             try:
                 obj = {"_id": self.get_max(),
                         "hash": uhash, "full": fullUrl, "counter": 0,
-                        "created": now, "lastreq": now}
+                        "created": now, "lastreq": now, 'encfull': url_prepare(fullUrl)}
                 created = self.col.insert(obj)
                 if created:
                     self.id, self.data = obj["_id"], obj
@@ -248,7 +269,7 @@ class t34Url(t34Base):
         if max_val["ok"]:
             if max_val["result"]:
                 result = min_val if max_val["result"][0]["val"] < min_val else max_val["result"][0]["val"]
-                return int(result)
+                return int(result + 1)
             else:
                 return min_val
         else:
@@ -264,7 +285,7 @@ class t34Url(t34Base):
 
     def complement(self, compl_data):
         if self.id:
-            result = self.col.update({"_id": self.id, {"$set": {"creator": compl_data}}})
+            result = self.col.update({"_id": self.id}, {"$set": {"creator": compl_data}})
             if result["updatedExisting"]:
                 # self.refresh()
                 self.data["creator"] = compl_data

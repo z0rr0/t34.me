@@ -15,6 +15,7 @@ DB = {
 
 # This dynamically discovers the path to the project
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
+MEDIA = os.path.join(PROJECT_PATH, 'media')
 
 ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 SIMPLE_ALPHABET = '0123456789abcdefghijkmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ'
@@ -25,6 +26,8 @@ MIN_ID = 100
 MAX_WAITING_LOCK = 20
 # max attemps free-add url
 FREE_ATTEMPS = 3
+# PREFIX = "http://t34.me/"
+PREFIX = "/"
 
 # rewrite global setting vars
 try:

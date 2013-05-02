@@ -5,44 +5,77 @@
 # please look https://developers.google.com/safe-browsing/
 
 import os, settings, bottle
+from t34methods import *
 
-MEDIA = os.path.join(settings.PROJECT_PATH, 'media')
+# ToDo
+# prefix
+# national domains
+# national encoding
 
 @bottle.get('/')
 def index():
-    return bottle.template('index', content="Ok")
+    return bottle.template('index')
 
-@bottle.route('/<name:re:[0-9a-zA-Z]+>')
-def index2(name='World'):
-    forum_id = bottle.request.query.id
-    name2 = bottle.request.forms.name
-    name = "123"
+@bottle.post('/')
+def result():
+    global PREFIX
+    value = bottle.request.forms.t34url
+    try:
+        obj = t34Url()
+    except (t34GenExt,) as e:
+        raise HTTPError(500)
+    result = settings.PREFIX + obj.create(value)
     mdict = {"method": bottle.request.method,
         "raddr": bottle.request.remote_addr,
         "rroute": bottle.request.remote_route}
-    print(dir(bottle.request))
-    print(mdict)
-    return bottle.template('<b>Hello {{name}}</b>!!! f={{ fid }} <a href="/media/empty">aaa</a>', name=name, fid=forum_id)
+    obj.complement(mdict)
+    return bottle.template('result', var=result)
+
+@bottle.get('/<link:re:[0-9a-zA-Z]+>')
+def prepare(link):
+    if settings.DEBUG:
+        print("prepare", link)
+    try:
+        obj = t34Url(link)
+    except (t34GenExt,) as e:
+        raise HTTPError(500)
+    if obj:
+        obj.update()
+        # to use this function our shourld to parse url - url_prepare():
+        # national domain; national url; username/password/port and etc...
+        if obj.data["encfull"]:
+            bottle.redirect(obj.data['encfull'])
+        # javasctipt - it's very simple variant
+        return bottle.template('redirect', url=obj.data['full'])
+    # forum_id = bottle.request.query.id
+    raise bottle.HTTPError(404)
 
 @bottle.error(404)
 def error404(error):
-    return 'Nothing here, sorry'
+    return bottle.template('404')
 
-@bottle.route('/yandex/')
-def wrong():
-    bottle.redirect("http://ya.ru")
-
-def is_ajax():
-    if bottle.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return True
-    else:
-        return False
+@bottle.error(500)
+def error500(error):
+    return bottle.template('500')
 
 @bottle.route('/media/<filename:path>')
 def media(filename):
     global MEDIA
-    return bottle.static_file(filename, root=MEDIA)
+    return bottle.static_file(filename, root=settings.MEDIA)
 
+@bottle.route('/about/')
+def about():
+    views = os.path.join(settings.PROJECT_PATH, 'views')
+    print(views)
+    return bottle.static_file("about.html", root=views)
+
+@bottle.route('/about/')
+def about():
+    views = os.path.join(settings.PROJECT_PATH, 'views')
+    print(views)
+    return bottle.static_file("about.html", root=views)
+
+bottle.TEMPLATES.clear()
 if settings.DEBUG:
     bottle.run(host='localhost', port=28080, debug=True, reloader=True)
 else:
