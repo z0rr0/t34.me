@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 
 # basic tests
-import random, settings, t34methods
+import random, settings, t34methods, t34urls
 
 def test_converter(limit=10):
     test_name = "test_converter"
@@ -152,6 +152,20 @@ def test_update_counter():
         if settings.DEBUG:
             print(obj.data)
         assert(obj.delete(None, None, test_url) == True)
+    except (AssertionError,) as e:
+        print(e, "Test '{0}' is not passed".format(test_name))
+        return 1
+    print("Test '{0}' is passed".format(test_name))
+    return 0
+
+# server should be run
+def test_api():
+    test_name = "test_api"
+    print("\nTest '{0}' is started...".format(test_name))
+    test_url = "http://t34.me"
+    obj = t34methods.t34Url()
+    try:
+        pass
     except (AssertionError,) as e:
         print(e, "Test '{0}' is not passed".format(test_name))
         return 1

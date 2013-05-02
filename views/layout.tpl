@@ -36,20 +36,18 @@
           <h4>Rules</h4>
           <p>
             You can't use this service for:
-            <ul>
-              <li>promotional mailings</li>
-              <li>spam mailing</li>
-              <li>the dissemination of malicious programs</li>
-              <li>fraudulent or illegal activities</li>
-            </ul>
           </p>
+          <ul>
+            <li>promotional mailings</li>
+            <li>spam mailing</li>
+            <li>the dissemination of malicious programs</li>
+            <li>fraudulent or illegal activities</li>
+          </ul>
         </div>
       </div>
     </div> <!-- /container -->
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/media/js/jquery-2.0.0.min.js"></script>
-    <script src="/media/bootstrap/js/bootstrap.min.js"></script>
   </body>
 </html>

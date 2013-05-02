@@ -25,7 +25,8 @@ def result():
     except (t34GenExt,) as e:
         raise HTTPError(500)
     result = settings.PREFIX + obj.create(value)
-    mdict = {"method": bottle.request.method,
+    mdict = {"api": False,
+        "method": bottle.request.method,
         "raddr": bottle.request.remote_addr,
         "rroute": bottle.request.remote_route}
     obj.complement(mdict)
@@ -49,6 +50,23 @@ def prepare(link):
         return bottle.template('redirect', url=obj.data['full'])
     # forum_id = bottle.request.query.id
     raise bottle.HTTPError(404)
+
+@bottle.route('/api')
+def api():
+    if bottle.request.query.u:
+        try:
+            obj = t34Url()
+        except (t34GenExt,) as e:
+            return "Error"
+        result = settings.PREFIX + obj.create(bottle.request.query.u)
+        mdict = {"api": True,
+            "method": bottle.request.method,
+            "raddr": bottle.request.remote_addr,
+            "rroute": bottle.request.remote_route}
+        obj.complement(mdict)
+        return result
+    else:
+        bottle.redirect("/")
 
 @bottle.error(404)
 def error404(error):
