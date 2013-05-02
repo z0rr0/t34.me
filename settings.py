@@ -40,9 +40,15 @@ except ImportError:
 #     "counter": 2,                                         # increment counter of requests
 #     "created": date1,                                     # creation datetime
 #     "lastreq": date2,                                     # last request datetime
+#     "creator": {
+#       "raddr": "192.168.0.1",
+#       "rroute": ["192.168.0.1"],
+#       "method": "GET",
+#       "api": false,
+#   }
 # }
 # db.urls.ensureIndex({"hash": 1}, {"unique": 1})
-# db.urls.ensureIndex({"created": 1, "modified": 1})
+# db.urls.ensureIndex({"created": 1, "lastreq": 1})
 # db.urls.ensureIndex({"counter": -1})
 
 # db.locks = {

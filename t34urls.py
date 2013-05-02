@@ -16,6 +16,12 @@ def index():
 def index2(name='World'):
     forum_id = bottle.request.query.id
     name2 = bottle.request.forms.name
+    name = "123"
+    mdict = {"method": bottle.request.method,
+        "raddr": bottle.request.remote_addr,
+        "rroute": bottle.request.remote_route}
+    print(dir(bottle.request))
+    print(mdict)
     return bottle.template('<b>Hello {{name}}</b>!!! f={{ fid }} <a href="/media/empty">aaa</a>', name=name, fid=forum_id)
 
 @bottle.error(404)

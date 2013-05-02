@@ -261,3 +261,12 @@ class t34Url(t34Base):
                 self.refresh()
                 return True
         return False
+
+    def complement(self, compl_data):
+        if self.id:
+            result = self.col.update({"_id": self.id, {"$set": {"creator": compl_data}}})
+            if result["updatedExisting"]:
+                # self.refresh()
+                self.data["creator"] = compl_data
+                return True
+        return False
