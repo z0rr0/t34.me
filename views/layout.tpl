@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>{{ title or 'No title' }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
+    <meta name="description" content="short urls">
     <meta name="author" content="tank@t34.me">
     <!-- CSS -->
     <link href="/media/bootstrap/css/bootstrap.css" rel="stylesheet">

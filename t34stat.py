@@ -23,8 +23,8 @@ def main():
         return
     print("Max counter:")
     counter_stat(opts.records, date)
-    print("\nMax request from address:")
-    radd_stat(opts.records, date)
+    # print("\nMax request from address:")
+    # radd_stat(opts.records, date)
 
 def counter_stat(num, start):
     try:
