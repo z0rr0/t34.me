@@ -6,5 +6,8 @@ T34.me
 ### Resources:
 
 * [Python](http://python.org/)
-* [Bottle](http://bottlepy.org/)
 * [MongoDB](http://www.mongodb.org/)
+* [Bottle](http://bottlepy.org/)
+* [Boostrap](http://twitter.github.io/bootstrap/)
+
+[GPL3](http://www.gnu.org/licenses/gpl.html) license.
