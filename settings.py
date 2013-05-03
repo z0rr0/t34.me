@@ -8,7 +8,7 @@ if socket.gethostname() in ('t34.me', 'thebestzorro.ru',):
     DEBUG = False
 else:
     DEBUG = True
-# DEBUG = True
+DEBUG = False
 
 DB = {
     "host": "",

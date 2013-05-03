@@ -4,6 +4,8 @@
 # basic tests
 import random, settings, t34methods
 
+ESTR = "a" if settings.DEBUG else "1C"
+
 def test_prepate():
     try:
         db = t34methods.mongo_connect()
@@ -81,13 +83,14 @@ def test_locks():
 
 def test_obj_creation():
     """for test _id=10=a"""
+    global ESTR
     test_name = "test_obj_creation"
     print("\nTest '{0}' is started...".format(test_name))
     test_url = "http://t34.me"
     obj = t34methods.t34Url(None, True)
     try:
         result = obj.create(test_url)
-        assert(result == "a")
+        assert(result == ESTR)
         if settings.DEBUG:
             print(obj.data)
         assert(obj.delete(None, None, test_url) == True)
@@ -99,6 +102,7 @@ def test_obj_creation():
 
 def test_obj_deletion():
     """for test _id=10=a"""
+    global ESTR
     test_name = "test_obj_deletion"
     print("\nTest '{0}' is started...".format(test_name))
     test_url = "http://t34.me"
@@ -106,16 +110,16 @@ def test_obj_deletion():
     try:
         # by num
         result = obj.create(test_url)
-        assert(result == "a")
+        assert(result == ESTR)
         key = obj.id
         assert(obj.delete(key) == True)
         # by short url
         result = obj.create(test_url)
-        assert(result == "a")
+        assert(result == ESTR)
         assert(obj.delete(None, result) == True)
         # by full url
         result = obj.create(test_url)
-        assert(result == "a")
+        assert(result == ESTR)
         assert(obj.delete(None, None, test_url) == True)
     except (AssertionError, t34methods.t34GenExt) as e:
         print(e, "Test '{0}' is not passed".format(test_name))
@@ -124,15 +128,16 @@ def test_obj_deletion():
     return 0
 
 def test_double_create():
+    global ESTR
     test_name = "test_double_create"
     print("\nTest '{0}' is started...".format(test_name))
     test_url = "http://t34.me"
     obj = t34methods.t34Url(None, True)
     try:
         result1 = obj.create(test_url)
-        assert(result1 == "a")
+        assert(result1 == ESTR)
         result2 = obj.create(test_url)
-        assert(result2 == "a")
+        assert(result2 == ESTR)
         if settings.DEBUG:
             print(obj.data)
         obj2 = t34methods.t34Url(None, True)
@@ -149,13 +154,14 @@ def test_double_create():
 
 def test_update_counter():
     test_name = "test_update_counter"
+    global ESTR
     print("\nTest '{0}' is started...".format(test_name))
     max_in_test = 10
     test_url = "http://t34.me"
     obj = t34methods.t34Url(None, True)
     try:
         result = obj.create(test_url)
-        assert(result == "a")
+        assert(result == ESTR)
         assert(obj.data["counter"] == 0)
         assert(obj.update() == True)
         for i in range(max_in_test - 1):
