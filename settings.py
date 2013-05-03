@@ -6,9 +6,11 @@ import os, socket
 ADMIN = "admin@t34.me"
 if socket.gethostname() in ('t34.me', 'thebestzorro.ru',):
     DEBUG = False
+    PREFIX = "http://t34.me/"
 else:
     DEBUG = True
-# DEBUG = False
+    PREFIX = "/"
+# DEBUG = True
 
 DB = {
     "host": "",
@@ -30,8 +32,6 @@ MIN_ID = 100
 MAX_WAITING_LOCK = 20
 # max attemps free-add url
 FREE_ATTEMPS = 3
-# PREFIX = "http://t34.me/"
-PREFIX = "/"
 # days for statistics
 STAT_DAYS = 7
 

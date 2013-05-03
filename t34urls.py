@@ -42,7 +42,7 @@ def prepare(link):
         raise HTTPError(500)
     raise bottle.HTTPError(404)
 
-@bottle.route('/api')
+@bottle.route('/api/')
 def api():
     if bottle.request.query.u:
         try:
