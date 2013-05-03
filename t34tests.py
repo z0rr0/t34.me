@@ -5,10 +5,12 @@
 import random, settings, t34methods
 
 def test_prepate():
-    db = t34methods.mongo_connect()
-    if db:
-        db.tests.remove()
-        db.testlocks.remove()
+    try:
+        db = t34methods.mongo_connect()
+    except (t34methods.t34MongoEx,) as e:
+        return
+    db.tests.remove()
+    db.testlocks.remove()
 
 def test_converter(limit=10):
     test_name = "test_converter"
@@ -32,7 +34,11 @@ def test_converter(limit=10):
 def test_mongo():
     test_name = "test_mongo"
     print("\nTest '{0}' is started...".format(test_name))
-    db = t34methods.mongo_connect()
+    try:
+        db = t34methods.mongo_connect()
+    except (t34methods.t34MongoEx,) as e:
+        print("Test '{0}' is not passed".format(test_name))
+        return 1
     if db:
         urls = db.urls
         print("test value: {0}".format(urls.find_one()))
@@ -47,11 +53,10 @@ def test_urlobj():
     print("\nTest '{0}' is started...".format(test_name))
     obj = t34methods.t34Url(None, True)
     try:
-        assert(obj.db is not None)
         if settings.DEBUG:
             print("{0}, get_max={1}".format(obj, obj.get_max()))
         assert(str(obj) == "<t34: 0>")
-    except (AssertionError,) as e:
+    except (AssertionError, t34methods.t34GenExt) as e:
         print(str(obj))
         print(e, "Test '{0}' is not passed".format(test_name))
         return 1
@@ -63,13 +68,12 @@ def test_locks():
     print("\nTest '{0}' is started...".format(test_name))
     obj = t34methods.t34Url(None, True)
     try:
-        assert(obj.db is not None)
         obj.lock(True)
         if settings.DEBUG:
             print(obj.locks.find_one())
         obj.lock(False)
         assert(obj.locks.find_one() == None)
-    except (AssertionError,) as e:
+    except (AssertionError, t34methods.t34GenExt) as e:
         print(e, "Test '{0}' is not passed".format(test_name))
         return 1
     print("Test '{0}' is passed".format(test_name))
@@ -82,7 +86,6 @@ def test_obj_creation():
     test_url = "http://t34.me"
     obj = t34methods.t34Url(None, True)
     try:
-        assert(obj.db is not None)
         result = obj.create(test_url)
         assert(result == "a")
         if settings.DEBUG:
@@ -101,7 +104,6 @@ def test_obj_deletion():
     test_url = "http://t34.me"
     obj = t34methods.t34Url(None, True)
     try:
-        assert(obj.db is not None)
         # by num
         result = obj.create(test_url)
         assert(result == "a")
@@ -127,14 +129,18 @@ def test_double_create():
     test_url = "http://t34.me"
     obj = t34methods.t34Url(None, True)
     try:
-        assert(obj.db is not None)
         result1 = obj.create(test_url)
         assert(result1 == "a")
         result2 = obj.create(test_url)
         assert(result2 == "a")
         if settings.DEBUG:
             print(obj.data)
+        obj2 = t34methods.t34Url(None, True)
+        result3 = obj2.create(test_url)
+        assert(obj == obj2)
+        assert(result3 == result2)
         assert(obj.delete(None, None, test_url) == True)
+        assert(obj2.delete(None, None, test_url) == True)
     except (AssertionError, t34methods.t34GenExt) as e:
         print(e, "Test '{0}' is not passed".format(test_name))
         return 1
@@ -144,17 +150,17 @@ def test_double_create():
 def test_update_counter():
     test_name = "test_update_counter"
     print("\nTest '{0}' is started...".format(test_name))
+    max_in_test = 10
     test_url = "http://t34.me"
     obj = t34methods.t34Url(None, True)
     try:
-        assert(obj.db is not None)
         result = obj.create(test_url)
         assert(result == "a")
         assert(obj.data["counter"] == 0)
         assert(obj.update() == True)
-        for i in range(99):
+        for i in range(max_in_test - 1):
             obj.update()
-        assert(obj.data["counter"] == 100)
+        assert(obj.data["counter"] == max_in_test)
         if settings.DEBUG:
             print(obj.data)
         assert(obj.delete(None, None, test_url) == True)

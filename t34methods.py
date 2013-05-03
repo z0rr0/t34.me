@@ -12,7 +12,7 @@ CACHE_DEFAULT = hashlib.sha1().hexdigest()
 
 class t34MongoEx(Exception):
     def __init__(self):
-        self.value = "t34MongoEx: auth error for monogDB connection"
+        self.value = "t34MongoEx: auth/connect error of MongoDB"
     def __str__(self):
         return repr(self.value)
 
@@ -209,8 +209,9 @@ class t34Url(t34Base):
                     self.id, self.data = obj["_id"], obj
                     return True
             except (pymongo.errors.DuplicateKeyError,) as e:
-                # the unsuccessful attempt
                 time.sleep(0.1 + random.random())
+            except (pymongo.errors.ConnectionFailure, AttributeError) as e:
+                raise t34GenExt()
         return self.create_lock(fullUrl)
 
     def create_lock(self, fullUrl):
@@ -220,12 +221,12 @@ class t34Url(t34Base):
         if self.lock(True):
             # DB is locked
             uhash = hashlib.sha1(fullUrl.encode("utf-8")).hexdigest()
-            already = self.col.find_one({"hash": uhash})
-            if already:
-                self.id, self.data = already["_id"], already
-                return True
-            now = datetime.datetime.utcnow()
             try:
+                already = self.col.find_one({"hash": uhash})
+                if already:
+                    self.id, self.data = already["_id"], already
+                    return True
+                now = datetime.datetime.utcnow()
                 obj = {"_id": self.get_max(),
                         "hash": uhash, "inaddr": fullUrl, "counter": 0,
                         "created": now, "lastreq": now, 'outaddr': url_prepare(fullUrl)}
@@ -233,7 +234,7 @@ class t34Url(t34Base):
                 if created:
                     self.id, self.data = obj["_id"], obj
                     return True
-            except (pymongo.errors.ConnectionFailure,) as e:
+            except (pymongo.errors.ConnectionFailure, AttributeError) as e:
                 raise t34GenExt()
         # can't lock DB
         return False
@@ -263,19 +264,20 @@ class t34Url(t34Base):
                     lock = self.locks.insert({"_id": 1, "thread": thread, "status": now()})
                     if lock: return True
                 except (pymongo.errors.DuplicateKeyError,) as e:
-                    # print(e)
                     time.sleep(0.5 + random.random())
+                except (pymongo.errors.ConnectionFailure, AttributeError) as e:
+                    raise t34GenExt()
             return False
         else:
             self.locks.remove({"thread": thread})
         return True
 
     def get_max(self):
-        max_val = self.col.aggregate({"$group": {"_id": "max", "val": {"$max": "$_id"}}})
-        if settings.DEBUG:
-            min_val = 10
-        else:
-            min_val = settings.MIN_ID
+        try:
+            max_val = self.col.aggregate({"$group": {"_id": "max", "val": {"$max": "$_id"}}})
+        except (pymongo.errors.ConnectionFailure, AttributeError) as e:
+            raise t34GenExt()
+        min_val = 10 if settings.DEBUG else settings.MIN_ID
         if max_val["ok"]:
             if max_val["result"]:
                 result = min_val if max_val["result"][0]["val"] < min_val else max_val["result"][0]["val"]
@@ -292,7 +294,7 @@ class t34Url(t34Base):
                 if result["updatedExisting"]:
                     self.refresh()
                     return True
-            except (pymongo.errors.ConnectionFailure,) as e:
+            except (pymongo.errors.ConnectionFailure, AttributeError) as e:
                 raise t34GenExt()
         return False
 
@@ -304,6 +306,6 @@ class t34Url(t34Base):
                     # self.refresh()
                     self.data["creator"] = compl_data
                     return True
-            except (pymongo.errors.ConnectionFailure,) as e:
+            except (pymongo.errors.ConnectionFailure, AttributeError) as e:
                 raise t34GenExt()
         return False

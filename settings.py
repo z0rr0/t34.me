@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
-import os
+import os, socket
 
 ADMIN = "admin@t34.me"
-DEBUG = True
+if socket.gethostname() in ('t34.me', 'thebestzorro.ru',):
+    DEBUG = False
+else:
+    DEBUG = True
+# DEBUG = True
 
 DB = {
     "host": "",

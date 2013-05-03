@@ -19,18 +19,22 @@ def main():
     try:
         date = datetime.datetime.strptime(opts.date, "%Y-%m-%d")
     except (ValueError,) as e:
-        print(e)
-        print("ERROR: please use date format YYYY-mm-dd, now your incorrect date: {0}".format(opts.date))
+        print(e, "\nERROR: please use date format YYYY-mm-dd, now your incorrect date: {0}".format(opts.date))
         return
-    get_stat(opts.records, date)
+    print("Max counter:")
+    counter_stat(opts.records, date)
+    print("\nMax request from address:")
+    radd_stat(opts.records, date)
 
-def get_stat(num, start):
-    db = t34methods.mongo_connect()
-    if not db:
+def counter_stat(num, start):
+    try:
+        db = t34methods.mongo_connect()
+        col = db.urls
+        results = col.find({"lastreq": {"$gte": start}}).sort([("counter", pymongo.DESCENDING), ("lastreq", pymongo.ASCENDING)]).limit(num)
+    except (t34methods.t34MongoEx, AttributeError) as e:
+        print(e)
         print("ERROR: problem with mongoDB connect")
         return
-    col = db.urls
-    results = col.find({"lastreq": {"$gte": start}}).sort([("counter", pymongo.DESCENDING), ("lastreq", pymongo.ASCENDING)]).limit(num)
     i = 1
     template = "ID={0}, short=http://t34.me/{6}\n\tcounter={1}, creator={2}, api={5}\n\tlastreq={3}, created={4}"
     if results.count():
@@ -38,7 +42,25 @@ def get_stat(num, start):
     for res in results:
         print(i, template.format(res["_id"], res["counter"], res["creator"]["raddr"], res["lastreq"], res["created"], res["creator"]["api"], t34methods.t34_encode(res["_id"])))
         i += 1
+    return 0
 
+def radd_stat(num, start):
+    try:
+        db = t34methods.mongo_connect()
+        col = db.urls
+        results = col.aggregate([{"$match": {"lastreq": {"$gte": start}}}, {"$group": {"_id": "$creator.raddr", "sum": {"$sum": 1}, "ids": {"$addToSet" : "$_id" }}}, {"$sort": {"sum": -1}}, {"$limit": num}])
+    except (t34methods.t34MongoEx, AttributeError) as e:
+        print(e)
+        print("ERROR: problem with mongoDB connect")
+        return
+    if results["ok"]:
+        i = 1
+        template = "{0}  tIP={1}, sum links={2}\n\t{3}"
+        for res in results['result']:
+            print(template.format(i, res["_id"], res["sum"], res["ids"]))
+            i += 1
+    else:
+        print("incorrect aggregare request")
 
 if __name__ == '__main__':
     main()
