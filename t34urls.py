@@ -7,11 +7,6 @@
 import os, pymongo, settings, bottle
 from t34methods import *
 
-# ToDo
-# prefix
-# national domains
-# national encoding
-
 @bottle.get('/')
 def index():
     return bottle.template('index')
@@ -37,17 +32,14 @@ def prepare(link):
         print("prepare", link)
     try:
         obj = t34Url(link)
-        obj.update()
+        if obj:
+            obj.update()
+            if obj.data["outaddr"]:
+                bottle.redirect(obj.data['outaddr'])
+            # javasctipt - it's very simple variant
+            return bottle.template('redirect', url=obj.data['inaddr'])
     except (t34GenExt, pymongo.errors.ConnectionFailure) as e:
         raise HTTPError(500)
-    if obj:
-        # to use this function our shourld to parse url - url_prepare():
-        # national domain; national url; username/password/port and etc...
-        if obj.data["outaddr"]:
-            bottle.redirect(obj.data['outaddr'])
-        # javasctipt - it's very simple variant
-        return bottle.template('redirect', url=obj.data['inaddr'])
-    # forum_id = bottle.request.query.id
     raise bottle.HTTPError(404)
 
 @bottle.route('/api')
@@ -92,7 +84,6 @@ def about():
     print(views)
     return bottle.static_file("about.html", root=views)
 
-bottle.TEMPLATES.clear()
 if settings.DEBUG:
     bottle.run(host='0.0.0.0', port=28080, debug=True, reloader=True)
 else:
