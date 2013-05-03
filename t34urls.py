@@ -71,15 +71,14 @@ def error500(error):
 
 @bottle.route('/media/<filename:path>')
 def media(filename):
-    global MEDIA
     return bottle.static_file(filename, root=settings.MEDIA)
 
 @bottle.route('/about/')
 def about():
     views = os.path.join(settings.PROJECT_PATH, 'views')
-    print(views)
     return bottle.static_file("about.html", root=views)
 
+bottle.TEMPLATE_PATH.insert(0, os.path.join(settings.PROJECT_PATH, 'views'))
 if settings.DEBUG:
     bottle.run(host='0.0.0.0', port=28080, debug=True, reloader=True)
 else:
