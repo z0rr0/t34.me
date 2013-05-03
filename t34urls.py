@@ -32,7 +32,7 @@ def prepare(link):
         print("prepare", link)
     try:
         obj = t34Url(link)
-        if obj:
+        if obj.data:
             obj.update()
             if obj.data["outaddr"]:
                 bottle.redirect(obj.data['outaddr'])
@@ -71,12 +71,6 @@ def error500(error):
 def media(filename):
     global MEDIA
     return bottle.static_file(filename, root=settings.MEDIA)
-
-@bottle.route('/about/')
-def about():
-    views = os.path.join(settings.PROJECT_PATH, 'views')
-    print(views)
-    return bottle.static_file("about.html", root=views)
 
 @bottle.route('/about/')
 def about():
