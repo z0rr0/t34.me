@@ -109,7 +109,7 @@ def url_prepare(link):
 class t34Base(object):
     """docstring for t34Base"""
     def __init__(self, shortID=None):
-        self.db = None
+        self.db, self.data = None, None
         self.id = 0 if not shortID else t34_decode(shortID)
         self.connection()
 
@@ -129,6 +129,11 @@ class t34Base(object):
 
     def __bool__(self):
         return bool(self.data)
+
+    def __len__(self):
+        if not self.data:
+            return 0
+        return len(t34_encode(self.data["_id"]))
 
     def __lt__(self, other):
         return self.id < other.id
@@ -160,7 +165,6 @@ class t34Url(t34Base):
     """
     def __init__(self, shortID=None, isTest=False):
         super(t34Url, self).__init__(shortID)
-        self.data = None
         self.get_data(isTest)
 
     def get_data(self, isTest=False):

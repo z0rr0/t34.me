@@ -32,7 +32,7 @@ def prepare(link):
         print("prepare", link)
     try:
         obj = t34Url(link)
-        if obj.data:
+        if obj:
             obj.update()
             if obj.data["outaddr"]:
                 bottle.redirect(obj.data['outaddr'])
