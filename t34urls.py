@@ -14,6 +14,8 @@ def index():
 @bottle.post('/')
 def result():
     value = bottle.request.forms.t34url
+    if not value.strip():
+        bottle.redirect("/")
     try:
         obj = t34Url()
         result = settings.PREFIX + obj.create(value)
