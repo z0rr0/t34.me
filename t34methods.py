@@ -2,7 +2,13 @@
 #-*- coding: utf-8 -*-
 
 # This file contains base methods
-import settings, datetime, time, pymongo, hashlib, random, urllib, re, threading
+import settings, datetime, time, pymongo, hashlib, random, re, threading
+try:
+    from urllib.parse import urlparse, urlunparse, quote
+except ImportError:
+    # deploy exception, don't need it for right python settings
+    from urlparse import urlparse, urlunparse
+    from urllib import quote
 
 t34dict = settings.ALPHABET
 # t34dict = settings.SIMPLE_ALPHABET
@@ -88,17 +94,16 @@ def url_prepare(link):
     try:
         if not prefix.findall(link):
             link = "http://" + link
-        templ = urllib.parse.urlparse(link)
-        q = urllib.parse.quote
+        templ = urlparse(link)
         new_url = {
             "scheme": templ.scheme,
             "netloc": templ.netloc.encode('idna').decode('utf-8'),
-            "path": q(templ.path, safe="%/:=&?~#+!$,;'@()*[]"),
-            "query": q(templ.query, safe="%/:=&?~#+!$,;'@()*[]"),
-            "params": q(templ.params, safe="%/:=&?~#+!$,;'@()*[]"),
-            "fragment": q(templ.fragment, safe="%/:=&?~#+!$,;'@()*[]"),
+            "path": quote(templ.path, safe="%/:=&?~#+!$,;'@()*[]"),
+            "query": quote(templ.query, safe="%/:=&?~#+!$,;'@()*[]"),
+            "params": quote(templ.params, safe="%/:=&?~#+!$,;'@()*[]"),
+            "fragment": quote(templ.fragment, safe="%/:=&?~#+!$,;'@()*[]"),
         }
-        result = urllib.parse.urlunparse((new_url["scheme"], new_url["netloc"], new_url["path"], new_url["params"], new_url["query"], new_url["fragment"]))
+        result = urlunparse((new_url["scheme"], new_url["netloc"], new_url["path"], new_url["params"], new_url["query"], new_url["fragment"]))
     except (Exception,) as e:
         result = ""
     return result

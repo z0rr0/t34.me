@@ -185,7 +185,8 @@ def test_url_converter():
         ("https://президент.рф/визиты", "https://xn--d1abbgf6aiiy.xn--p1ai/%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D1%8B"),
         ("https://google.com/?search=я", "https://google.com/?search=%D1%8F"),
         ("http://randomsite.com/paragraph#map1", "http://randomsite.com/paragraph#map1"),
-        ("http://randomsite.com/параграф#map1", "http://randomsite.com/%D0%BF%D0%B0%D1%80%D0%B0%D0%B3%D1%80%D0%B0%D1%84#map1")
+        ("http://randomsite.com/параграф#map1", "http://randomsite.com/%D0%BF%D0%B0%D1%80%D0%B0%D0%B3%D1%80%D0%B0%D1%84#map1"),
+        ("dddd", "http://dddd")
     )
     obj = t34methods.t34Url(None, True)
     try:
