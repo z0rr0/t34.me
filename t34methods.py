@@ -175,7 +175,10 @@ class t34Url(t34Base):
                 self.col = self.db.tests
                 self.locks = self.db.testlocks
             if self.id:
-                self.data = self.col.find_one({"_id": self.id})
+                try:
+                    self.data = self.col.find_one({"_id": self.id})
+                except (Exception,) as e:
+                    self.data = None
 
     def refresh(self):
         if self.db and self.id:
