@@ -4,7 +4,7 @@
 # This file contains main handlers of web pages
 # please look https://developers.google.com/safe-browsing/
 
-import os, settings, bottle
+import os, pymongo, settings, bottle
 from t34methods import *
 
 # ToDo
@@ -18,18 +18,17 @@ def index():
 
 @bottle.post('/')
 def result():
-    global PREFIX
     value = bottle.request.forms.t34url
     try:
         obj = t34Url()
+        result = settings.PREFIX + obj.create(value)
+        mdict = {"api": False,
+            "method": bottle.request.method,
+            "raddr": bottle.request.remote_addr,
+            "rroute": bottle.request.remote_route}
+        obj.complement(mdict)
     except (t34GenExt,) as e:
         raise HTTPError(500)
-    result = settings.PREFIX + obj.create(value)
-    mdict = {"api": False,
-        "method": bottle.request.method,
-        "raddr": bottle.request.remote_addr,
-        "rroute": bottle.request.remote_route}
-    obj.complement(mdict)
     return bottle.template('result', var=result)
 
 @bottle.get('/<link:re:[0-9a-zA-Z]+>')
@@ -38,16 +37,16 @@ def prepare(link):
         print("prepare", link)
     try:
         obj = t34Url(link)
-    except (t34GenExt,) as e:
+        obj.update()
+    except (t34GenExt, pymongo.errors.ConnectionFailure) as e:
         raise HTTPError(500)
     if obj:
-        obj.update()
         # to use this function our shourld to parse url - url_prepare():
         # national domain; national url; username/password/port and etc...
-        if obj.data["encfull"]:
-            bottle.redirect(obj.data['encfull'])
+        if obj.data["outaddr"]:
+            bottle.redirect(obj.data['outaddr'])
         # javasctipt - it's very simple variant
-        return bottle.template('redirect', url=obj.data['full'])
+        return bottle.template('redirect', url=obj.data['inaddr'])
     # forum_id = bottle.request.query.id
     raise bottle.HTTPError(404)
 
@@ -56,14 +55,14 @@ def api():
     if bottle.request.query.u:
         try:
             obj = t34Url()
+            result = settings.PREFIX + obj.create(bottle.request.query.u)
+            mdict = {"api": True,
+                "method": bottle.request.method,
+                "raddr": bottle.request.remote_addr,
+                "rroute": bottle.request.remote_route}
+            obj.complement(mdict)
         except (t34GenExt,) as e:
             return "Error"
-        result = settings.PREFIX + obj.create(bottle.request.query.u)
-        mdict = {"api": True,
-            "method": bottle.request.method,
-            "raddr": bottle.request.remote_addr,
-            "rroute": bottle.request.remote_route}
-        obj.complement(mdict)
         return result
     else:
         bottle.redirect("/")
@@ -95,6 +94,6 @@ def about():
 
 bottle.TEMPLATES.clear()
 if settings.DEBUG:
-    bottle.run(host='localhost', port=28080, debug=True, reloader=True)
+    bottle.run(host='0.0.0.0', port=28080, debug=True, reloader=True)
 else:
     bottle.TEMPLATES.clear()

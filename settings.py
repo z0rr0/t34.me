@@ -28,6 +28,8 @@ MAX_WAITING_LOCK = 20
 FREE_ATTEMPS = 3
 # PREFIX = "http://t34.me/"
 PREFIX = "/"
+# days for statistics
+STAT_DAYS = 7
 
 # rewrite global setting vars
 try:
@@ -39,7 +41,8 @@ except ImportError:
 # db.urls = {
 #     "_id": 3244,                                          # _id => decode alphabet syms
 #      "hash": "4a8a9fc31dc15a4b87bb145b05db3ae0bf2333e4"   # url sha1 hash
-#     "full": "http://yandex.ru",                           # url
+#     "inaddr": "https://www.google.ru/search?q=я"          # input url
+#     "outaddr": "https://www.google.ru/search?q=%D1%8F"    # converted url
 #     "counter": 2,                                         # increment counter of requests
 #     "created": date1,                                     # creation datetime
 #     "lastreq": date2,                                     # last request datetime
@@ -51,7 +54,7 @@ except ImportError:
 #   }
 # }
 # db.urls.ensureIndex({"hash": 1}, {"unique": 1})
-# db.urls.ensureIndex({"created": 1, "lastreq": 1})
+# db.urls.ensureIndex({"lastreq": 1, "created": 1})
 # db.urls.ensureIndex({"counter": -1})
 
 # db.locks = {

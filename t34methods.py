@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 
 # This file contains base methods
-import settings, datetime, time, pymongo, hashlib, random, urllib, re
+import settings, datetime, time, pymongo, hashlib, random, urllib, re, threading
 
 t34dict = settings.ALPHABET
 # t34dict = settings.SIMPLE_ALPHABET
@@ -16,11 +16,11 @@ class t34MongoEx(Exception):
     def __str__(self):
         return repr(self.value)
 
-class t34LockExt(Exception):
-    def __init__(self):
-        self.value = "t34LockExt: lock error for monogDB connection"
-    def __str__(self):
-        return repr(self.value)
+# class t34LockExt(Exception):
+#     def __init__(self):
+#         self.value = "t34LockExt: lock error for monogDB connection"
+#     def __str__(self):
+#         return repr(self.value)
 
 class t34GenExt(Exception):
     def __init__(self):
@@ -40,7 +40,7 @@ def mongo_connect():
         if not db.authenticate(settings.DB['user'], settings.DB['password']):
             return False
     except (pymongo.errors.OperationFailure, pymongo.errors.ConnectionFailure) as e:
-        return False
+        raise t34MongoEx()
     return db
 
 def t34_decode(x, basis=basLen):
@@ -114,10 +114,12 @@ class t34Base(object):
         self.connection()
 
     def connection(self):
-        db = mongo_connect()
-        if db:
-            self.db = db
-        # raise t34MongoEx()
+        try:
+            db = mongo_connect()
+            if db:
+                self.db = db
+        except (t34MongoEx,) as e:
+            pass
 
     def __repr__(self):
         return "<t34: {0}>".format(self.id)
@@ -156,15 +158,18 @@ class t34Url(t34Base):
 
     shortID 1-100 are reserved for tests
     """
-    def __init__(self, shortID=None):
+    def __init__(self, shortID=None, isTest=False):
         super(t34Url, self).__init__(shortID)
         self.data = None
-        self.get_data()
+        self.get_data(isTest)
 
-    def get_data(self):
+    def get_data(self, isTest=False):
         if self.db:
             self.col = self.db.urls
             self.locks = self.db.locks
+            if isTest:
+                self.col = self.db.tests
+                self.locks = self.db.testlocks
             if self.id:
                 self.data = self.col.find_one({"_id": self.id})
 
@@ -172,7 +177,13 @@ class t34Url(t34Base):
         if self.db and self.id:
             self.data = self.col.find_one({"_id": self.id})
 
+    def reset(self, fullUrl):
+        self.id, self.data = 0, None
+        self.create(fullUrl)
+
     def create(self, fullUrl):
+        if self.db is None:
+            raise t34GenExt()
         if self.create_free(fullUrl):
             return t34_encode(self.id)
         return None
@@ -191,8 +202,8 @@ class t34Url(t34Base):
             now = datetime.datetime.utcnow()
             try:
                 obj = {"_id": self.get_max(),
-                    "hash": uhash, "full": fullUrl, "counter": 0,
-                    "created": now, "lastreq": now, 'encfull': url_prepare(fullUrl)}
+                    "hash": uhash, "inaddr": fullUrl, "counter": 0,
+                    "created": now, "lastreq": now, 'outaddr': url_prepare(fullUrl)}
                 created = self.col.insert(obj)
                 if created:
                     self.id, self.data = obj["_id"], obj
@@ -216,15 +227,14 @@ class t34Url(t34Base):
             now = datetime.datetime.utcnow()
             try:
                 obj = {"_id": self.get_max(),
-                        "hash": uhash, "full": fullUrl, "counter": 0,
-                        "created": now, "lastreq": now, 'encfull': url_prepare(fullUrl)}
+                        "hash": uhash, "inaddr": fullUrl, "counter": 0,
+                        "created": now, "lastreq": now, 'outaddr': url_prepare(fullUrl)}
                 created = self.col.insert(obj)
                 if created:
                     self.id, self.data = obj["_id"], obj
                     return True
-            except (pymongo.errors.ConnectionFailure, t34GenExt) as e:
-                # object creation error
-                return False
+            except (pymongo.errors.ConnectionFailure,) as e:
+                raise t34GenExt()
         # can't lock DB
         return False
 
@@ -277,17 +287,23 @@ class t34Url(t34Base):
 
     def update(self):
         if self:
-            result = self.col.update({"_id": self.id}, {"$set": {"lastreq": datetime.datetime.utcnow()}, "$inc": {"counter": 1}})
-            if result["updatedExisting"]:
-                self.refresh()
-                return True
+            try:
+                result = self.col.update({"_id": self.id}, {"$set": {"lastreq": datetime.datetime.utcnow()}, "$inc": {"counter": 1}})
+                if result["updatedExisting"]:
+                    self.refresh()
+                    return True
+            except (pymongo.errors.ConnectionFailure,) as e:
+                raise t34GenExt()
         return False
 
     def complement(self, compl_data):
         if self.id:
-            result = self.col.update({"_id": self.id}, {"$set": {"creator": compl_data}})
-            if result["updatedExisting"]:
-                # self.refresh()
-                self.data["creator"] = compl_data
-                return True
+            try:
+                result = self.col.update({"_id": self.id}, {"$set": {"creator": compl_data}})
+                if result["updatedExisting"]:
+                    # self.refresh()
+                    self.data["creator"] = compl_data
+                    return True
+            except (pymongo.errors.ConnectionFailure,) as e:
+                raise t34GenExt()
         return False

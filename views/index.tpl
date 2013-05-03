@@ -1,6 +1,8 @@
 <p class="lead">This form returns short link for any your URL.</p>
 <form class="form-inline" method="POST" action="">
-  <input type="url" class="input-xxlarge" placeholder="Your URL" name="t34url" align="middle">
-  <button type="submit" class="btn">&nbsp;Submit&nbsp;</button>
+  <div class="input-append">
+    <input type="url" placeholder="Your URL" class="input-xlarge" name="t34url">
+    <button class="btn" type="submit">Go</button>
+    </div>
 </form>
 %rebase layout title='T-34'

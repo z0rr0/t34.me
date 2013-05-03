@@ -2,7 +2,13 @@
 #-*- coding: utf-8 -*-
 
 # basic tests
-import random, settings, t34methods, t34urls
+import random, settings, t34methods
+
+def test_prepate():
+    db = t34methods.mongo_connect()
+    if db:
+        db.tests.remove()
+        db.testlocks.remove()
 
 def test_converter(limit=10):
     test_name = "test_converter"
@@ -39,7 +45,7 @@ def test_mongo():
 def test_urlobj():
     test_name = "test_urlobj"
     print("\nTest '{0}' is started...".format(test_name))
-    obj = t34methods.t34Url()
+    obj = t34methods.t34Url(None, True)
     try:
         assert(obj.db is not None)
         if settings.DEBUG:
@@ -55,7 +61,7 @@ def test_urlobj():
 def test_locks():
     test_name = "test_locks"
     print("\nTest '{0}' is started...".format(test_name))
-    obj = t34methods.t34Url()
+    obj = t34methods.t34Url(None, True)
     try:
         assert(obj.db is not None)
         obj.lock(True)
@@ -74,7 +80,7 @@ def test_obj_creation():
     test_name = "test_obj_creation"
     print("\nTest '{0}' is started...".format(test_name))
     test_url = "http://t34.me"
-    obj = t34methods.t34Url()
+    obj = t34methods.t34Url(None, True)
     try:
         assert(obj.db is not None)
         result = obj.create(test_url)
@@ -82,7 +88,7 @@ def test_obj_creation():
         if settings.DEBUG:
             print(obj.data)
         assert(obj.delete(None, None, test_url) == True)
-    except (AssertionError,) as e:
+    except (AssertionError, t34methods.t34GenExt) as e:
         print(e, "Test '{0}' is not passed".format(test_name))
         return 1
     print("Test '{0}' is passed".format(test_name))
@@ -93,7 +99,7 @@ def test_obj_deletion():
     test_name = "test_obj_deletion"
     print("\nTest '{0}' is started...".format(test_name))
     test_url = "http://t34.me"
-    obj = t34methods.t34Url()
+    obj = t34methods.t34Url(None, True)
     try:
         assert(obj.db is not None)
         # by num
@@ -109,7 +115,7 @@ def test_obj_deletion():
         result = obj.create(test_url)
         assert(result == "a")
         assert(obj.delete(None, None, test_url) == True)
-    except (AssertionError,) as e:
+    except (AssertionError, t34methods.t34GenExt) as e:
         print(e, "Test '{0}' is not passed".format(test_name))
         return 1
     print("Test '{0}' is passed".format(test_name))
@@ -119,7 +125,7 @@ def test_double_create():
     test_name = "test_double_create"
     print("\nTest '{0}' is started...".format(test_name))
     test_url = "http://t34.me"
-    obj = t34methods.t34Url()
+    obj = t34methods.t34Url(None, True)
     try:
         assert(obj.db is not None)
         result1 = obj.create(test_url)
@@ -129,7 +135,7 @@ def test_double_create():
         if settings.DEBUG:
             print(obj.data)
         assert(obj.delete(None, None, test_url) == True)
-    except (AssertionError,) as e:
+    except (AssertionError, t34methods.t34GenExt) as e:
         print(e, "Test '{0}' is not passed".format(test_name))
         return 1
     print("Test '{0}' is passed".format(test_name))
@@ -139,7 +145,7 @@ def test_update_counter():
     test_name = "test_update_counter"
     print("\nTest '{0}' is started...".format(test_name))
     test_url = "http://t34.me"
-    obj = t34methods.t34Url()
+    obj = t34methods.t34Url(None, True)
     try:
         assert(obj.db is not None)
         result = obj.create(test_url)
@@ -152,20 +158,29 @@ def test_update_counter():
         if settings.DEBUG:
             print(obj.data)
         assert(obj.delete(None, None, test_url) == True)
-    except (AssertionError,) as e:
+    except (AssertionError, t34methods.t34GenExt) as e:
         print(e, "Test '{0}' is not passed".format(test_name))
         return 1
     print("Test '{0}' is passed".format(test_name))
     return 0
 
-# server should be run
-def test_api():
-    test_name = "test_api"
+def test_url_converter():
+    test_name = "test_url_converter"
     print("\nTest '{0}' is started...".format(test_name))
-    test_url = "http://t34.me"
-    obj = t34methods.t34Url()
+    utls = (
+        ("http://t34.me", "http://t34.me"),
+        ("президент.рф", "http://xn--d1abbgf6aiiy.xn--p1ai"),
+        ("https://президент.рф/визиты", "https://xn--d1abbgf6aiiy.xn--p1ai/%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D1%8B"),
+        ("https://google.com/?search=я", "https://google.com/?search=%D1%8F"),
+        ("http://randomsite.com/paragraph#map1", "http://randomsite.com/paragraph#map1"),
+        ("http://randomsite.com/параграф#map1", "http://randomsite.com/%D0%BF%D0%B0%D1%80%D0%B0%D0%B3%D1%80%D0%B0%D1%84#map1")
+    )
+    obj = t34methods.t34Url(None, True)
     try:
-        pass
+        for url in utls:
+            if settings.DEBUG:
+                print("check: {0} <==> {1}".format(t34methods.url_prepare(url[0]), url[1]))
+            assert(t34methods.url_prepare(url[0]) == url[1])
     except (AssertionError,) as e:
         print(e, "Test '{0}' is not passed".format(test_name))
         return 1
@@ -174,6 +189,7 @@ def test_api():
 
 if __name__ == '__main__':
     total, er = 0, 0
+    test_prepate()
     if test_converter(2):
         er += 1
     total += 1
@@ -196,6 +212,9 @@ if __name__ == '__main__':
         er += 1
     total += 1
     if test_update_counter():
+        er += 1
+    total += 1
+    if test_url_converter():
         er += 1
     total += 1
     print("\nThe test result: total={0}, with error={1}, passed={2}".format(total, er, total-er))
