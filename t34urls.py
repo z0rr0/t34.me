@@ -55,6 +55,8 @@ def api():
                 "raddr": bottle.request.remote_addr,
                 "rroute": bottle.request.remote_route}
             obj.complement(mdict)
+            if bottle.request.query.web:
+                return bottle.template('result', var=result)
         except (t34GenExt,) as e:
             return "Error"
         return result

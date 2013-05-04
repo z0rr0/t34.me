@@ -45,7 +45,10 @@
           </ul>
         </div>
       </div>
-    </div> <!-- /container -->
+    </div>
+    <!-- API
+    <a href="javascript:location.href='http://t34.me/api/?web=1&u='+encodeURIComponent(location.href)">bookmark</a>
+     -->
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
