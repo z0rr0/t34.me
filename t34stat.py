@@ -30,12 +30,14 @@ def counter_stat(num, start):
     try:
         db = t34methods.mongo_connect()
         col = db.urls
+        total = db.urls.find().count()
         results = col.find({"lastreq": {"$gte": start}}).sort([("counter", pymongo.DESCENDING), ("lastreq", pymongo.ASCENDING)]).limit(num)
     except (t34methods.t34MongoEx, AttributeError) as e:
         print(e)
         print("ERROR: problem with mongoDB connect")
         return
     i = 1
+    print("total links: {0}".format(total))
     template = "ID={0}, short=http://t34.me/{6}\n\tcounter={1}, creator={2}, api={5}\n\tlastreq={3}, created={4}"
     if results.count():
         print("Top:")

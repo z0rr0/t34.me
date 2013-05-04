@@ -7,7 +7,7 @@
     <meta name="description" content="short urls">
     <meta name="author" content="tank@t34.me">
     <!-- CSS -->
-    <link href="/media/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/media/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/media/css/custom.css" rel="stylesheet">
   </head>
 
