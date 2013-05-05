@@ -98,10 +98,10 @@ def url_prepare(link):
         new_url = {
             "scheme": templ.scheme,
             "netloc": templ.netloc.encode('idna').decode('utf-8'),
-            "path": quote(templ.path, safe="%/:=&?~#+!$,;'@()*[]"),
-            "query": quote(templ.query, safe="%/:=&?~#+!$,;'@()*[]"),
-            "params": quote(templ.params, safe="%/:=&?~#+!$,;'@()*[]"),
-            "fragment": quote(templ.fragment, safe="%/:=&?~#+!$,;'@()*[]"),
+            "path": quote(templ.path.encode("utf-8"), safe="%/:=&?~#+!$,;'@()*[]"),
+            "query": quote(templ.query.encode("utf-8"), safe="%/:=&?~#+!$,;'@()*[]"),
+            "params": quote(templ.params.encode("utf-8"), safe="%/:=&?~#+!$,;'@()*[]"),
+            "fragment": quote(templ.fragment.encode("utf-8"), safe="%/:=&?~#+!$,;'@()*[]"),
         }
         result = urlunparse((new_url["scheme"], new_url["netloc"], new_url["path"], new_url["params"], new_url["query"], new_url["fragment"]))
     except (Exception,) as e:
