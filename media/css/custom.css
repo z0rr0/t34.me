@@ -2,6 +2,7 @@ body {
   height: 100%;
   padding-top: 20px;
   padding-bottom: 40px;
+  font-family: 'PT Sans Caption', Helvetica, Verdana, Arial, sans-serif;
 }
 
 /* Custom container */
@@ -19,8 +20,9 @@ body {
   text-align: center;
 }
 .jumbotron h1 {
-  font-size: 36px;
+  font-size: 32px;
   line-height: 1;
+  font-weight: 700;
 }
 
 
@@ -45,11 +47,11 @@ input {
 /* Custom page CSS
 -------------------------------------------------- */
 /* Not required for template or sticky footer method. */
-
+/*
 .container {
   width: auto;
   max-width: 680px;
 }
 .container .credit {
   margin: 20px 0;
-}
+}*/
