@@ -10,4 +10,4 @@ T34.me
 * [Bottle](http://bottlepy.org/)
 * [Boostrap](http://twitter.github.io/bootstrap/)
 
-[GPL3](http://www.gnu.org/licenses/gpl.html) license.
+[GPLv3](http://www.gnu.org/licenses/gpl.html) license.
