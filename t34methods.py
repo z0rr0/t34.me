@@ -22,12 +22,6 @@ class t34MongoEx(Exception):
     def __str__(self):
         return repr(self.value)
 
-# class t34LockExt(Exception):
-#     def __init__(self):
-#         self.value = "t34LockExt: lock error for monogDB connection"
-#     def __str__(self):
-#         return repr(self.value)
-
 class t34GenExt(Exception):
     def __init__(self):
         self.value = "t34GenExt: logic error of t34Url"
@@ -88,7 +82,6 @@ def std_decode(x, basis):
     return None
 
 def url_prepare(link):
-    # for national domains
     link = link.strip()
     prefix = re.compile(r'^(.+)://', re.UNICODE)
     try:
