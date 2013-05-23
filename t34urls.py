@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
-# This file contains main handlers of web pages
-# please look https://developers.google.com/safe-browsing/
-
 import os, pymongo, settings, bottle
 from t34methods import *
 
@@ -82,8 +79,7 @@ def about():
 
 bottle.TEMPLATE_PATH.insert(0, os.path.join(settings.PROJECT_PATH, 'views'))
 bottle.TEMPLATES.clear()
-if __name__ == "__main__":
-    if settings.DEBUG:
-        bottle.run(host='127.0.0.1', port=28080, debug=True, reloader=True)
+if settings.DEBUG:
+        bottle.run(host='0.0.0.0', port=28080, debug=True, reloader=True)
 else:
     application = bottle.default_app()

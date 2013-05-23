@@ -4,7 +4,7 @@
 import os, socket
 
 ADMIN = "admin@t34.me"
-if socket.gethostname() in ('t34.me', 'thebestzorro.ru',):
+if socket.gethostname() in ('t34.me', 'thebestzorro.ru', 'condict.ru'):
     DEBUG = False
     PREFIX = "http://t34.me/"
 else:
