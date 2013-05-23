@@ -31,7 +31,7 @@
       <div class="row-fluid marketing">
         <div class="span6">
           <h4>Why</h4>
-          <p>Sometimes addresses of interesting web pages are long. But you want send them to your friends or use some other way. Then <strong>t34.me</strong> will help you.</p>
+          <p>Sometimes addresses of interesting web pages are long. But you want to send them to your friends (email, sms, etc.) or use some other way. Then <strong>t34.me</strong> will help you.</p>
         </div>
         <div class="span6">
           <h4>Rules</h4>
