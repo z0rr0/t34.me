@@ -80,6 +80,6 @@ def about():
 bottle.TEMPLATE_PATH.insert(0, os.path.join(settings.PROJECT_PATH, 'views'))
 bottle.TEMPLATES.clear()
 if settings.DEBUG:
-        bottle.run(host='0.0.0.0', port=28080, debug=True, reloader=True)
+    bottle.run(host='0.0.0.0', port=28080, debug=True, reloader=True)
 else:
     application = bottle.default_app()
