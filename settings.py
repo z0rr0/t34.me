@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
-import os, socket
+import os
 
-ADMIN = "admin@t34.me"
-if socket.gethostname() in ('t34.me', 'thebestzorro.ru', 'condict.ru'):
-    DEBUG = False
-    PREFIX = "http://t34.me/"
-else:
-    DEBUG = True
-    PREFIX = "/"
-# DEBUG = True
+ADMIN = ''
+DEBUG = False
+PREFIX = "http://MY_SITE_NAME"
 
 DB = {
     "host": "",
@@ -36,6 +31,7 @@ FREE_ATTEMPS = 3
 STAT_DAYS = 7
 
 # rewrite global setting vars
+# Define in local_settings: DB, DEBUG, PREFIX, ADMIN
 try:
     from local_settings import *
 except ImportError:
