@@ -107,7 +107,7 @@ def url_prepare(link):
 class t34Base(object):
     """docstring for t34Base"""
     def __init__(self, shortID=None):
-        self.db, self.data = None, None
+        self.db, self.data, self.newest = None, None, False
         self.id = 0 if not shortID else t34_decode(shortID)
         self.connection()
 
@@ -211,7 +211,7 @@ class t34Url(t34Base):
                     "created": now, "lastreq": now, 'outaddr': url_prepare(fullUrl)}
                 created = self.col.insert(obj)
                 if created:
-                    self.id, self.data = obj["_id"], obj
+                    self.id, self.data, self.newest = obj["_id"], obj, True
                     return True
             except (pymongo.errors.DuplicateKeyError,) as e:
                 time.sleep(0.1 + random.random())
@@ -237,7 +237,7 @@ class t34Url(t34Base):
                         "created": now, "lastreq": now, 'outaddr': url_prepare(fullUrl)}
                 created = self.col.insert(obj)
                 if created:
-                    self.id, self.data = obj["_id"], obj
+                    self.id, self.data, self.newest = obj["_id"], obj, True
                     return True
             except (pymongo.errors.ConnectionFailure, AttributeError) as e:
                 raise t34GenExt()

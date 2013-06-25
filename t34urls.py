@@ -16,11 +16,12 @@ def result():
     try:
         obj = t34Url()
         result = settings.PREFIX + obj.create(value)
-        mdict = {"api": False,
-            "method": bottle.request.method,
-            "raddr": bottle.request.remote_addr,
-            "rroute": bottle.request.remote_route}
-        obj.complement(mdict)
+        if obj.newest:
+            obj.complement({"api": False,
+                "method": bottle.request.method,
+                "raddr": bottle.request.remote_addr,
+                "rroute": bottle.request.remote_route
+            })
     except (t34GenExt,) as e:
         raise HTTPError(500)
     return bottle.template('result', var=result)
@@ -47,11 +48,12 @@ def api():
         try:
             obj = t34Url()
             result = settings.PREFIX + obj.create(bottle.request.query.u)
-            mdict = {"api": True,
-                "method": bottle.request.method,
-                "raddr": bottle.request.remote_addr,
-                "rroute": bottle.request.remote_route}
-            obj.complement(mdict)
+            if obj.newest:
+                obj.complement({"api": True,
+                    "method": bottle.request.method,
+                    "raddr": bottle.request.remote_addr,
+                    "rroute": bottle.request.remote_route
+                })
             if bottle.request.query.web:
                 return bottle.template('result', var=result)
         except (t34GenExt,) as e:

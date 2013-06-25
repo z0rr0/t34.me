@@ -200,6 +200,30 @@ def test_url_converter():
     print("Test '{0}' is passed".format(test_name))
     return 0
 
+def test_obj_newest():
+    """for test _id=10=a"""
+    global ESTR
+    test_name = "test_obj_newest"
+    print("\nTest '{0}' is started...".format(test_name))
+    test_url = "http://google.com/123"
+    obj = t34methods.t34Url(None, True)
+    try:
+        result = obj.create(test_url)
+        assert(result == ESTR)
+        if settings.DEBUG:
+            print(obj.data)
+        assert(obj.newest == True)
+        obj2 = t34methods.t34Url(None, True)
+        result = obj2.create(test_url)
+        assert(obj2.newest == False)
+        assert(obj.delete(None, None, test_url) == True)
+        assert(obj2.delete(None, None, test_url) == True)
+    except (AssertionError, t34methods.t34GenExt) as e:
+        print(e, "Test '{0}' is not passed".format(test_name))
+        return 1
+    print("Test '{0}' is passed".format(test_name))
+    return 0
+
 if __name__ == '__main__':
     total, er = 0, 0
     test_prepate()
@@ -228,6 +252,9 @@ if __name__ == '__main__':
         er += 1
     total += 1
     if test_url_converter():
+        er += 1
+    total += 1
+    if test_obj_newest():
         er += 1
     total += 1
     print("\nThe test result: total={0}, with error={1}, passed={2}".format(total, er, total-er))
