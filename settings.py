@@ -59,7 +59,7 @@ except ImportError:
 
 # db.locks = {
 #     "_id": 1,
-#     "threading": 3492394756                               # thread ID
+#     "threading": 3492394756                               # parent class ID
 #     "status": date3                                       # date of creation
 # }
 # db.locks.ensureIndex({"status": 1}, {expireAfterSeconds: 30})
