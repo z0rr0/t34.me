@@ -1,4 +1,4 @@
-<p class="lead">This form returns short link for any URL.</p>
+<p class="lead">This form returns the short link for any your URL.</p>
 <form class="form-inline" method="POST" action="">
   <div class="input-append">
     <input type="url" placeholder="Your URL" class="input-xlarge" name="t34url" required>
