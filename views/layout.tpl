@@ -16,7 +16,7 @@
     <div class="container-narrow">
       <div class="masthead">
         <ul class="nav nav-pills pull-right">
-          <li><a href="/about/">About</a></li>
+          <li><a href="/about/">About project</a></li>
           <!-- <li><a href="/api/">API</a></li>  -->
           <li><a href="https://github.com/z0rr0/t34.me">Sources on GitHub</a></li>
         </ul>
