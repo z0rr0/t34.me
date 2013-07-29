@@ -28,5 +28,6 @@
         %include
       </div>
     </div>
+  {{!metrika}}
   </body>
 </html>

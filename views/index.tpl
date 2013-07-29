@@ -5,4 +5,4 @@
     <button class="btn" type="submit">Go</button>
     </div>
 </form>
-%rebase layout title='T-34'
+%rebase layout title='T-34',metrika=m
