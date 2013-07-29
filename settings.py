@@ -14,6 +14,9 @@ DB = {
     "password": ""
 }
 
+# Yandex metrika code
+METRIKA = ""
+
 # This dynamically discovers the path to the project
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 MEDIA = os.path.join(PROJECT_PATH, 'media')
