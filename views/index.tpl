@@ -3,4 +3,4 @@
     <input type="url" placeholder="Your URL" class="form-control input-lg" name="t34url" required autofocus>
     <button class="btn btn-success" type="submit">Get short link</button>
 </form>
-%rebase layout title='T-34'
+%rebase layout title='T-34',metrika=m
