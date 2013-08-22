@@ -13,27 +13,26 @@
   </head>
 
   <body>
-    <div class="container-narrow">
-      <div class="masthead">
+    <div class="container">
+      <div class="header">
         <ul class="nav nav-pills pull-right">
           <li><a href="/about/">About project</a></li>
           <!-- <li><a href="/api/">API</a></li>  -->
           <li><a href="https://github.com/z0rr0/t34.me">Sources on GitHub</a></li>
         </ul>
-        <h3 class="muted"><a href="/">T-34</a></h3>
+        <h3 class="text-muted">T-34</h3>
       </div>
       <hr>
       <div class="jumbotron">
-        <h1>Easy and fast!<br/>But reliable as the T-34.</h1>
+        <h1>Easy and fast!</h1>
         %include
       </div>
-      <hr>
-      <div class="row-fluid marketing">
-        <div class="span6">
+      <div class="row marketing">
+        <div class="col-xs-6">
           <h4>Why</h4>
           <p>Sometimes addresses of interesting web pages are long. But you want to send them to your friends (email, sms, etc.) or use some other way. Then <strong>t34.me</strong> will help you.</p>
         </div>
-        <div class="span6">
+        <div class="col-xs-6">
           <h4>Rules</h4>
           <p>
             You can't use this service for:
