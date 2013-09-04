@@ -6,7 +6,7 @@ from t34methods import *
 
 @bottle.get('/')
 def index():
-    return bottle.template('index', m=settings.METRIKA)
+    return bottle.template('index')
 
 @bottle.post('/')
 def result():
@@ -24,7 +24,7 @@ def result():
             })
     except (t34GenExt,) as e:
         raise HTTPError(500)
-    return bottle.template('result', var=result, m=settings.METRIKA)
+    return bottle.template('result', var=result)
 
 @bottle.get('/<link:re:[0-9a-zA-Z]+>')
 def prepare(link):
@@ -55,7 +55,7 @@ def api():
                     "rroute": bottle.request.remote_route
                 })
             if bottle.request.query.web:
-                return bottle.template('result', var=result, m=settings.METRIKA)
+                return bottle.template('result', var=result)
         except (t34GenExt,) as e:
             return "Error"
         return result
@@ -64,11 +64,11 @@ def api():
 
 @bottle.error(404)
 def error404(error):
-    return bottle.template('404', m=settings.METRIKA)
+    return bottle.template('404')
 
 @bottle.error(500)
 def error500(error):
-    return bottle.template('500', m=settings.METRIKA)
+    return bottle.template('500')
 
 @bottle.route('/media/<filename:path>')
 def media(filename):

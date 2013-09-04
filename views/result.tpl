@@ -3,4 +3,4 @@
   <a href="{{ var }}" target="_blank" class="shorturl">{{ var }}</a>
 </h3>
 <a href="/" class="btn btn-success">Add new link</a>
-%rebase layout title='T-34',metrika=m
+%rebase layout title='T-34'

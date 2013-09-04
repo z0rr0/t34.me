@@ -13,14 +13,13 @@
   </head>
 
   <body>
-    <div class="container-narrow">
+    <div class="container">
       <div class="masthead">
         <ul class="nav nav-pills pull-right">
-          <li><a href="/about/">About</a></li>
           <!-- <li><a href="/api/">API</a></li>  -->
           <li><a href="https://github.com/z0rr0/t34.me">Sources on GitHub</a></li>
         </ul>
-        <h3 class="muted"><a href="/">T-34</a></h3>
+        <h3 class="text-muted"><a href="/">T-34</a></h3>
       </div>
       <hr>
       <div class="jumbotron">
@@ -28,6 +27,5 @@
         %include
       </div>
     </div>
-  {{!metrika}}
   </body>
 </html>
