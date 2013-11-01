@@ -52,7 +52,12 @@ def api():
     if bottle.request.query.u:
         try:
             obj = t34Url()
-            result = settings.PREFIX + obj.create(bottle.request.query.u)
+            returned_link = obj.create(bottle.request.query.u)
+            if returned_link is None:
+                if settings.DEBUG:
+                    print("can not add link from api:", bottle.request.query.u)
+                raise t34GenExt()
+            result = settings.PREFIX + returned_link
             if obj.newest:
                 obj.complement({"api": True,
                     "method": bottle.request.method,
