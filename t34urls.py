@@ -15,7 +15,12 @@ def result():
         bottle.redirect("/")
     try:
         obj = t34Url()
-        result = settings.PREFIX + obj.create(value)
+        returned_link = obj.create(value)
+        if returned_link is None:
+            if settings.DEBUG:
+                print("can not add link:", value)
+            raise t34GenExt()
+        result = settings.PREFIX + returned_link
         if obj.newest:
             obj.complement({"api": False,
                 "method": bottle.request.method,
