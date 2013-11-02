@@ -28,7 +28,7 @@ def result():
                 "rroute": bottle.request.remote_route
             })
     except (t34GenExt,) as e:
-        raise HTTPError(500)
+        raise bottle.HTTPError(500)
     return bottle.template('result', var=result)
 
 @bottle.get('/<link:re:[0-9a-zA-Z]+>')
@@ -44,7 +44,7 @@ def prepare(link):
             # javasctipt - it's very simple variant
             return bottle.template('redirect', url=obj.data['inaddr'])
     except (t34GenExt, pymongo.errors.ConnectionFailure) as e:
-        raise HTTPError(500)
+        raise bottle.HTTPError(500)
     raise bottle.HTTPError(404)
 
 @bottle.route('/api/')
