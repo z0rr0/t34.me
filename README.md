@@ -8,7 +8,7 @@ T34.me
 * [Python](http://python.org/)
 * [MongoDB](http://www.mongodb.org/)
 * [Bottle](http://bottlepy.org/)
-* [Boostrap](http://twitter.github.io/bootstrap/)
+* [Boostrap](http://getbootstrap.com/)
 * [Google Fonts - PT Sans Caption](http://www.google.com/fonts/#ChoosePlace:select/Collection:PT+Sans+Caption)
 
 [GPLv3](http://www.gnu.org/licenses/gpl.html) license.
