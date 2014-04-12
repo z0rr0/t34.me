@@ -36,8 +36,9 @@ def mongo_connect():
     db = None
     try:
         connection = pymongo.MongoClient(host=settings.DB['host'], port=settings.DB['port'])
+        autdb = settings.DB.get("authdb", settings.DB["database"])
         db = connection[settings.DB["database"]]
-        if not db.authenticate(settings.DB['user'], settings.DB['password']):
+        if not db.authenticate(settings.DB['user'], settings.DB['password'], source=autdb):
             return False
     except (pymongo.errors.OperationFailure, pymongo.errors.ConnectionFailure) as e:
         raise t34MongoEx()
