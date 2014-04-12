@@ -11,4 +11,4 @@ T34.me
 * [Boostrap](http://getbootstrap.com/)
 * [Google Fonts - PT Sans Caption](http://www.google.com/fonts/#ChoosePlace:select/Collection:PT+Sans+Caption)
 
-[GPLv3](http://www.gnu.org/licenses/gpl.html) license.
+[AGPLv3](http://www.gnu.org/licenses/agpl.html) license.
