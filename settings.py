@@ -3,15 +3,17 @@
 
 import os
 
-ADMIN = ''
+# real values can be defined in local_settings.py
+ADMIN = 'admin@MY_SITE_NAME'
 DEBUG = False
 PREFIX = "http://MY_SITE_NAME"
 
 DB = {
-    "host": "",
-    "port": "",
-    "user": "",
-    "password": ""
+    "host": "localhost",
+    "port": "27017",
+    "user": "username",
+    "password": "user_password"
+    "authdb": 'admin',
 }
 
 # Yandex metrika code
