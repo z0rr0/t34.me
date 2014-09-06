@@ -1,68 +1,76 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
+"""Info about statistics"""
 
-# statistics
-import optparse, datetime, settings, pymongo, t34methods
+import optparse
+import datetime
+import pymongo
+
+from handlers.settings import STAT_DAYS, LOGGER, PREFIX
+from handlers.t34base import MongodbBase, MongoEx, mongo_required
+from handlers.t34methods import T34Url
+
+class T34Stat(MongodbBase):
+    """docstring for T34Stat"""
+    def __init__(self):
+        super(T34Stat, self).__init__()
+        self._col = None
+        self.init()
+        if self.connected:
+            self._col = self._database.urls
+
+    @mongo_required
+    def total(self):
+        """returns total number of objects"""
+        return self._col.find().count() if self._col else 0
+
+    @mongo_required
+    def counter_stat(self, num, start):
+        """statistics"""
+        results = []
+        if self._col:
+            results = self._col.find({"lastreq": {"$gte": start}}).sort([("counter", pymongo.DESCENDING), ("lastreq", pymongo.ASCENDING)]).limit(num)
+        return results
 
 def main():
-    now  = datetime.datetime.utcnow()
-    start_date = now.date() + datetime.timedelta(days=-settings.STAT_DAYS)
+    """main method"""
+    now = datetime.datetime.utcnow()
+    start_date = now.date() + datetime.timedelta(days=-STAT_DAYS)
 
     parser = optparse.OptionParser()
-    parser.add_option("-r", "--records", dest="records", type="int", default=True,
-        help=("maximum records for statistics [default: %default]"))
-    parser.add_option("-d", "--date", dest="date",  type="string", default=True,
-        help=("date start [default: %default]"))
+    parser.add_option("-r", "--records", dest="records", type="int", default=True, help=("maximum records for statistics [default: %default]"))
+    parser.add_option("-d", "--date", dest="date", type="string", default=True, help=("date start [default: %default]"))
 
     parser.set_defaults(records=20, date=start_date.strftime("%Y-%m-%d"))
     opts, args = parser.parse_args()
     try:
         date = datetime.datetime.strptime(opts.date, "%Y-%m-%d")
-    except (ValueError,) as e:
-        print(e, "\nERROR: please use date format YYYY-mm-dd, now your incorrect date: {0}".format(opts.date))
+    except (ValueError,) as err:
+        LOGGER.info("\nERROR: {1} please use date format YYYY-mm-dd, now your incorrect date: {0}".format(opts.date, err))
         return
     print("Max counter:")
     counter_stat(opts.records, date)
-    # print("\nMax request from address:")
-    # radd_stat(opts.records, date)
 
 def counter_stat(num, start):
+    """print statistics"""
     try:
-        db = t34methods.mongo_connect()
-        col = db.urls
-        total = db.urls.find().count()
-        results = col.find({"lastreq": {"$gte": start}}).sort([("counter", pymongo.DESCENDING), ("lastreq", pymongo.ASCENDING)]).limit(num)
-    except (t34methods.MongoEx, AttributeError) as e:
-        print(e)
-        print("ERROR: problem with mongoDB connect")
-        return
+        obj = T34Stat()
+        if not obj.connected:
+            LOGGER.error("Cannot connect to MongoDB")
+        total = obj.total()
+        results = obj.counter_stat(num, start)
+    except (MongoEx, AttributeError) as err:
+        LOGGER.error(err)
+        return 1
     i = 1
     print("total links: {0}".format(total))
-    template = "ID={0}, short=http://t34.me/{6}\n\tcounter={1}, creator={2}, api={5}\n\tlastreq={3}, created={4}"
+    template = "ID={0}, short={7}{6}\n\tcounter={1}, creator={2}, api={5}\n\tlastreq={3}, created={4}"
     if results.count():
         print("Top:")
     for res in results:
-        print(i, template.format(res["_id"], res["counter"], res["creator"]["raddr"], res["lastreq"], res["created"], res["creator"]["api"], t34methods.t34_encode(res["_id"])))
+        print(i, template.format(res["_id"], res["counter"], res["creator"]["raddr"], res["lastreq"], res["created"], res["creator"]["api"], T34Url.t34_encode(res["_id"]), PREFIX))
         i += 1
     return 0
-
-def radd_stat(num, start):
-    try:
-        db = t34methods.mongo_connect()
-        col = db.urls
-        results = col.aggregate([{"$match": {"lastreq": {"$gte": start}}}, {"$group": {"_id": "$creator.raddr", "sum": {"$sum": 1}, "ids": {"$addToSet" : "$_id" }}}, {"$sort": {"sum": -1}}, {"$limit": num}])
-    except (t34methods.MongoEx, AttributeError) as e:
-        print(e)
-        print("ERROR: problem with mongoDB connect")
-        return
-    if results["ok"]:
-        i = 1
-        template = "{0}  tIP={1}, sum links={2}\n\t{3}"
-        for res in results['result']:
-            print(template.format(i, res["_id"], res["sum"], res["ids"]))
-            i += 1
-    else:
-        print("incorrect aggregare request")
 
 if __name__ == '__main__':
     main()

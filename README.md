@@ -8,7 +8,10 @@ T34.me
 * [Python](http://python.org/)
 * [MongoDB](http://www.mongodb.org/)
 * [Bottle](http://bottlepy.org/)
+* [python-qrcode](https://github.com/lincolnloop/python-qrcode)
+* [Pillow](http://python-pillow.github.io/)
 * [Boostrap](http://getbootstrap.com/)
+* [Pylint](http://www.pylint.org/)
 * [Google Fonts - PT Sans Caption](http://www.google.com/fonts/#ChoosePlace:select/Collection:PT+Sans+Caption)
 
 [AGPLv3](http://www.gnu.org/licenses/agpl.html) license.
@@ -17,4 +20,4 @@ T34.me
 <img src="./media/img/first_screen.jpg">
 
 ---
-<img src="./media/img/first_screen.jpg">
+<img src="./media/img/last_screen.jpg">

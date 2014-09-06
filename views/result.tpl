@@ -5,4 +5,7 @@
 <p>
   <a href="/" class="btn btn-success">Add new link</a>
 </p>
+<p>
+	<img src="/qrcode/{{ dirty }}" alt="QR Code">
+</p>
 % rebase('layout.tpl', title='T-34')

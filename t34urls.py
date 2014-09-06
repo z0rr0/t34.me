@@ -3,8 +3,9 @@
 """Main file"""
 
 import os
-import pymongo
 import bottle
+from io import BytesIO
+import qrcode
 
 from handlers.settings import LOGGER, PROJECT_PATH, PRODUCTION, MEDIA, PREFIX
 from handlers.t34base import T34GenExt, MongoEx, StripPathMiddleware
@@ -38,7 +39,7 @@ def result():
     except (T34GenExt, MongoEx) as err:
         LOGGER.warning(err)
         raise bottle.HTTPError(500)
-    return bottle.template('result', var=result_link)
+    return bottle.template('result', var=result_link, dirty=returned_link)
 
 @bottle.get('/<link:re:[0-9a-zA-Z]+>')
 def prepare(link):
@@ -98,16 +99,36 @@ def error500(error):
     LOGGER.debug(error.status)
     return bottle.template('500')
 
-@bottle.route('/media/<filename:path>')
+@bottle.get('/media/<filename:path>')
 def media(filename):
     """paths for media content"""
     return bottle.static_file(filename, root=MEDIA)
 
-@bottle.route('/about')
+@bottle.get('/about')
 def about():
     """about page"""
     views = os.path.join(PROJECT_PATH, 'views')
     return bottle.static_file("about.html", root=views)
+
+@bottle.get('/qrcode/<code>')
+def getqrcode(code):
+    """get QRcode"""
+    # LOGGER.debug('qrcode: {0}'.format(code))
+    result_link = PREFIX + code
+    qrc = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=6,
+        border=2
+    )
+    qrc.add_data(result_link)
+    qrc.make(fit=True)
+    img = qrc.make_image()
+    buf = BytesIO()
+    img.save(buf, 'PNG')
+    buf.seek(0)
+    bottle.response.content_type = 'image/png'
+    return buf.read()
 
 bottle.TEMPLATE_PATH.insert(0, os.path.join(PROJECT_PATH, 'views'))
 bottle.TEMPLATES.clear()
