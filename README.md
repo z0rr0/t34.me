@@ -1,7 +1,7 @@
 T34.me
 ======
 
-**[t34.me](http://t34.me/)** is a simple URL shortening web application. It can't be used for high load projects.
+**[t34.me](http://t34.me/)** is a simple URL shortening web application.
 
 ### Resources:
 
@@ -13,4 +13,8 @@ T34.me
 
 [AGPLv3](http://www.gnu.org/licenses/agpl.html) license.
 
+---
+<img src="./media/img/first_screen.jpg">
+
+---
 <img src="./media/img/first_screen.jpg">

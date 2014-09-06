@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
-"""Mais settigs configuration"""
+"""Main configuration"""
 
 import os
 import logging.config
@@ -19,14 +19,16 @@ DB = {
     "port": "27017",
     "user": "username",
     "password": "user_password",
-    "authdb": "admin"
+    "database": "dbname",
+    "authdb": "admin",
+    "REPLICA": None
 }
 
 # Yandex metrika code
 METRIKA = ""
 
 # This dynamically discovers the path to the project
-PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
+PROJECT_PATH = os.path.join(os.path.realpath(os.path.dirname(__file__)), "..")
 MEDIA = os.path.join(PROJECT_PATH, 'media')
 LOGGING_CFG = 'logging.json'
 LOGGING_FILE = '/tmp/t34.me.log'
@@ -56,9 +58,9 @@ STAT_DAYS = 7
 # rewrite global setting vars
 # Define in local_settings: DB, DEBUG, PREFIX, ADMIN
 try:
-    from local_settings import DB, DEBUG, PREFIX, ADMIN, PRODUCTION
+    from handlers.local_settings import DB, DEBUG, PREFIX, ADMIN, PRODUCTION
 except ImportError:
-    pass
+    print("Import error")
 
 if DEBUG:
     LOGGER = logging.getLogger('debugMode')

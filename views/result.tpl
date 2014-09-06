@@ -5,4 +5,4 @@
 <p>
   <a href="/" class="btn btn-success">Add new link</a>
 </p>
-%rebase layout title='T-34'
+% rebase('layout.tpl', title='T-34')

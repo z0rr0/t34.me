@@ -24,7 +24,7 @@
       <hr>
       <div class="jumbotron">
         <h1>{{ header }}</h1>
-        %include
+        {{ !base }}
       </div>
     </div>
   </body>

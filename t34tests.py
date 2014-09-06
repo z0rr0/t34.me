@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
+"""Internal tests"""
 
 # basic tests
-import random, settings, t34methods
+import random
+
+from handlers.settings import DEBUG, LOGGER
+from handlers.t34methods import T34Url
 
 ESTR = "a" if settings.DEBUG else "1C"
 
@@ -25,7 +29,7 @@ def test_converter(limit=10):
             x2 = t34methods.t34_encode(x1)
             if settings.DEBUG:
                 print("{0} == {1}".format(x2, x1))
-            assert(t34methods.t34_decode(x2) == x1)
+            assert(T34Url.t34_decode(x2) == x1)
             i +=1
     except (AssertionError,) as e:
         print(e, "Test '{0}' is not passed".format(test_name))

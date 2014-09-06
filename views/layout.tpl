@@ -25,7 +25,7 @@
       <hr>
       <div class="jumbotron">
         <h1>Easy and fast!</h1>
-        %include
+        {{ !base }}
       </div>
       <div class="row marketing">
         <div class="col-xs-6">
