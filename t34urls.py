@@ -114,7 +114,10 @@ def about():
 def getqrcode(code):
     """get QRcode"""
     # LOGGER.debug('qrcode: {0}'.format(code))
-    result_link = PREFIX + code
+    if not bottle.request.query.d:
+        result_link = PREFIX + code
+    else:
+        result_link = code
     qrc = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,

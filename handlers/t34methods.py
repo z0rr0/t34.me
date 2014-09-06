@@ -37,6 +37,10 @@ class T34Lock(MongodbBase):
         self._locks = None
         self.init()
 
+    @property
+    def locks(self):
+        return self._locks
+
     @mongo_required
     def __enter__(self):
         """lock operation before any actions"""
@@ -126,6 +130,10 @@ class T34Url(MongodbBase):
         """total info about an item"""
         return self._data
 
+    @property
+    def id(self):
+        return self._id
+
     @staticmethod
     def t34_decode(xsource, basis=BAS_LEN):
         """Convert any number basis-based to decimal:
@@ -190,6 +198,12 @@ class T34Url(MongodbBase):
                 self._data = self._col.find_one({"_id": self._id})
             return 0
         return 1
+
+    @mongo_required
+    def clean(self):
+        """delete all data, only for the test mode"""
+        assert self._is_test
+        self._col.remove({})
 
     @mongo_required
     def refresh(self):
@@ -295,7 +309,7 @@ class T34Url(MongodbBase):
             max_val = self._col.aggregate({"$group": {"_id": "max", "val": {"$max": "$_id"}}})
             if max_val.get('ok') != 1:
                 raise T34GenExt()
-            if max_val["result"][0]["val"]:
+            if max_val.get('result') and max_val["result"][0]["val"]:
                 result = result if max_val["result"][0]["val"] < result else max_val["result"][0]["val"]
         except (ConnectionFailure, AttributeError, IndexError) as err:
             LOGGER.error(err)
