@@ -28,9 +28,9 @@ METRIKA = ""
 # This dynamically discovers the path to the project
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 MEDIA = os.path.join(PROJECT_PATH, 'media')
-LOGGING_CFG = 'logging.cfg'
+LOGGING_CFG = 'logging.json'
 LOGGING_FILE = '/tmp/t34.me.log'
-LOGGING_CFG_PATH = os.path.join(PROJECT_PATH, LOGGING_CFG)
+LOGGING_CFG_PATH = os.path.join(PROJECT_PATH, 'configs', LOGGING_CFG)
 
 assert os.path.isfile(LOGGING_CFG_PATH)
 

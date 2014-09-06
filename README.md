@@ -12,3 +12,5 @@ T34.me
 * [Google Fonts - PT Sans Caption](http://www.google.com/fonts/#ChoosePlace:select/Collection:PT+Sans+Caption)
 
 [AGPLv3](http://www.gnu.org/licenses/agpl.html) license.
+
+<img src="./media/img/first_screen.jpg">
