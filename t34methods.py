@@ -1,24 +1,33 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
+"""This file contains base methods"""
 
-# This file contains base methods
-import settings, datetime, time, pymongo, hashlib, random, re, threading
-try:
-    from urllib.parse import urlparse, urlunparse, quote
-except ImportError:
-    # deploy exception, don't need it for right python settings
-    from urlparse import urlparse, urlunparse
-    from urllib import quote
+import datetime
+import time
+import pymongo
+import hashlib
+import random
+import re
+import threading
 
-t34dict = settings.ALPHABET
-# t34dict = settings.SIMPLE_ALPHABET
-basLen = len(t34dict)
+from settings import ALPHABET, DB, FREE_ATTEMPS, DEBUG, MAX_WAITING_LOCK
+from urllib.parse import urlparse, urlunparse, quote
+
+# try:
+#     from urllib.parse import urlparse, urlunparse, quote
+# except ImportError:
+#     # deploy exception, don't need it for right python settings
+#     from urlparse import urlparse, urlunparse
+#     from urllib import quote
+
+T34DICT = ALPHABET # or SIMPLE_ALPHABET
+BAS_LEN = len(T34DICT)
 
 CACHE_DEFAULT = hashlib.sha1().hexdigest()
 
-class t34MongoEx(Exception):
+class MongoEx(Exception):
     def __init__(self):
-        self.value = "t34MongoEx: auth/connect error of MongoDB"
+        self.value = "MongoEx: auth/connect error of MongoDB"
     def __str__(self):
         return repr(self.value)
 
@@ -35,43 +44,41 @@ def mongo_connect():
     """connect to MongoDB database"""
     db = None
     try:
-        connection = pymongo.MongoClient(host=settings.DB['host'], port=settings.DB['port'])
-        autdb = settings.DB.get("authdb", settings.DB["database"])
-        db = connection[settings.DB["database"]]
-        if not db.authenticate(settings.DB['user'], settings.DB['password'], source=autdb):
+        connection = pymongo.MongoClient(host=DB['host'], port=DB['port'])
+        autdb = DB.get("authdb", DB["database"])
+        db = connection[DB["database"]]
+        if not db.authenticate(DB['user'], DB['password'], source=autdb):
             return False
     except (pymongo.errors.OperationFailure, pymongo.errors.ConnectionFailure) as e:
-        raise t34MongoEx()
+        raise MongoEx()
     return db
 
-def t34_decode(x, basis=basLen):
+def t34_decode(x, basis=BAS_LEN):
     """
     Convert any number basis-based to decimal:
 
     x - source string
     result - decimal number
     """
-    global t34dict
     i, result = 0, 0
     syms = str(x)
     while syms:
-        result += t34dict.index(syms[-1]) * (basis**i)
+        result += T34DICT.index(syms[-1]) * (basis**i)
         syms = syms[:-1]
         i += 1
     return result
 
-def t34_encode(x, basis=basLen):
+def t34_encode(x, basis=BAS_LEN):
     """
     Convert any number from decimal to basis-based
 
     x - decimal interger number
     result - converted string
     """
-    global t34dict
     result = ""
     while x > 0:
         i = x % basis
-        result = t34dict[i] + result
+        result = T34DICT[i] + result
         x = x // basis
     return result
 
@@ -117,7 +124,7 @@ class t34Base(object):
             db = mongo_connect()
             if db:
                 self.db = db
-        except (t34MongoEx,) as e:
+        except (MongoEx,) as e:
             pass
 
     def __repr__(self):
@@ -200,7 +207,7 @@ class t34Url(t34Base):
         """
         uhash = hashlib.sha1(fullUrl.encode("utf-8")).hexdigest()
         created = False
-        for i in range(settings.FREE_ATTEMPS):
+        for i in range(FREE_ATTEMPS):
             already = self.col.find_one({"hash": uhash})
             if already:
                 self.id, self.data = already["_id"], already
@@ -262,10 +269,10 @@ class t34Url(t34Base):
     def lock(self, state=False):
         """state: True - lock, False - unlock"""
         now = datetime.datetime.utcnow
-        end_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=settings.MAX_WAITING_LOCK)
+        end_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=MAX_WAITING_LOCK)
         thread = threading.currentThread().ident
         if state:
-            while (now() < end_time):
+            while now() < end_time:
                 try:
                     lock = self.locks.insert({"_id": 1, "thread": thread, "status": now()})
                     if lock: return True
@@ -283,7 +290,7 @@ class t34Url(t34Base):
             max_val = self.col.aggregate({"$group": {"_id": "max", "val": {"$max": "$_id"}}})
         except (pymongo.errors.ConnectionFailure, AttributeError) as e:
             raise t34GenExt()
-        min_val = 10 if settings.DEBUG else settings.MIN_ID
+        min_val = 10 if DEBUG else MIN_ID
         if max_val["ok"]:
             if max_val["result"]:
                 result = min_val if max_val["result"][0]["val"] < min_val else max_val["result"][0]["val"]

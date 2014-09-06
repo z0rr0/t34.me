@@ -32,7 +32,7 @@ def counter_stat(num, start):
         col = db.urls
         total = db.urls.find().count()
         results = col.find({"lastreq": {"$gte": start}}).sort([("counter", pymongo.DESCENDING), ("lastreq", pymongo.ASCENDING)]).limit(num)
-    except (t34methods.t34MongoEx, AttributeError) as e:
+    except (t34methods.MongoEx, AttributeError) as e:
         print(e)
         print("ERROR: problem with mongoDB connect")
         return
@@ -51,7 +51,7 @@ def radd_stat(num, start):
         db = t34methods.mongo_connect()
         col = db.urls
         results = col.aggregate([{"$match": {"lastreq": {"$gte": start}}}, {"$group": {"_id": "$creator.raddr", "sum": {"$sum": 1}, "ids": {"$addToSet" : "$_id" }}}, {"$sort": {"sum": -1}}, {"$limit": num}])
-    except (t34methods.t34MongoEx, AttributeError) as e:
+    except (t34methods.MongoEx, AttributeError) as e:
         print(e)
         print("ERROR: problem with mongoDB connect")
         return

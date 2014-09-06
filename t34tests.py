@@ -9,7 +9,7 @@ ESTR = "a" if settings.DEBUG else "1C"
 def test_prepate():
     try:
         db = t34methods.mongo_connect()
-    except (t34methods.t34MongoEx,) as e:
+    except (t34methods.MongoEx,) as e:
         return
     db.tests.remove()
     db.testlocks.remove()
@@ -38,7 +38,7 @@ def test_mongo():
     print("\nTest '{0}' is started...".format(test_name))
     try:
         db = t34methods.mongo_connect()
-    except (t34methods.t34MongoEx,) as e:
+    except (t34methods.MongoEx,) as e:
         print("Test '{0}' is not passed".format(test_name))
         return 1
     if db:

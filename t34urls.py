@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
-import os, pymongo, settings, bottle
+import os
+import pymongo
+import bottle
+import settings
+
 from t34methods import *
 
 @bottle.get('/')

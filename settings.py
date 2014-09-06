@@ -1,19 +1,25 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
+"""Mais settigs configuration"""
 
 import os
+import logging.config
+from json import load
+
+VERSION = 'v0.8'
+
+DEBUG = False
+PRODUCTION = False
 
 # real values can be defined in local_settings.py
 ADMIN = 'admin@MY_SITE_NAME'
-DEBUG = False
 PREFIX = "http://MY_SITE_NAME"
-
 DB = {
     "host": "localhost",
     "port": "27017",
     "user": "username",
-    "password": "user_password"
-    "authdb": 'admin',
+    "password": "user_password",
+    "authdb": "admin"
 }
 
 # Yandex metrika code
@@ -22,6 +28,18 @@ METRIKA = ""
 # This dynamically discovers the path to the project
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 MEDIA = os.path.join(PROJECT_PATH, 'media')
+LOGGING_CFG = 'logging.cfg'
+LOGGING_FILE = '/tmp/t34.me.log'
+LOGGING_CFG_PATH = os.path.join(PROJECT_PATH, LOGGING_CFG)
+
+assert os.path.isfile(LOGGING_CFG_PATH)
+
+LOGGING_CFG = {}
+with open(LOGGING_CFG_PATH, 'r') as logging_fd:
+    LOGGING_CFG = load(logging_fd)
+    LOGGING_CFG['handlers']['file']['filename'] = LOGGING_FILE
+
+logging.config.dictConfig(LOGGING_CFG)
 
 ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 SIMPLE_ALPHABET = '0123456789abcdefghijkmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ'
@@ -38,10 +56,16 @@ STAT_DAYS = 7
 # rewrite global setting vars
 # Define in local_settings: DB, DEBUG, PREFIX, ADMIN
 try:
-    from local_settings import *
+    from local_settings import DB, DEBUG, PREFIX, ADMIN, PRODUCTION
 except ImportError:
     pass
 
+if DEBUG:
+    LOGGER = logging.getLogger('debugMode')
+else:
+    LOGGER = logging.getLogger('rpoductionMode')
+
+LOGGER.debug("mongo_db={0}".format(DB['database']))
 
 # db.urls = {
 #     "_id": 3244,                                          # _id => decode alphabet syms
