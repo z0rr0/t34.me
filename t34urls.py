@@ -78,11 +78,11 @@ def api():
                     "rroute": bottle.request.remote_route
                 })
             if bottle.request.query.web:
-                return bottle.template('result', var=result_link)
+                return bottle.template('result', var=result_link, dirty=returned_link)
         except (T34GenExt, MongoEx) as err:
             LOGGER.error(err)
             bottle.response.status = 500
-            return "Error"
+            result_link = "Error"
         return result_link
     else:
         bottle.redirect("/")
