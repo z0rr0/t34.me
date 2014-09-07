@@ -66,7 +66,7 @@ def api():
         try:
             obj = T34Url()
             returned_link = obj.create(bottle.request.query.u)
-            if not returned_link is None:
+            if returned_link is None:
                 LOGGER.warning("can not add link: {0}".format(bottle.request.query.u))
                 raise T34GenExt()
             result_link = PREFIX + returned_link
