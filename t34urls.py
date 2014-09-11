@@ -10,10 +10,13 @@ import qrcode
 from handlers.settings import LOGGER, PROJECT_PATH, PRODUCTION, MEDIA, PREFIX
 from handlers.t34base import T34GenExt, MongoEx, StripPathMiddleware
 from handlers.t34methods import T34Url
+from functools import lru_cache
 
 @bottle.get('/')
+@lru_cache(2)
 def index():
     """index page"""
+    LOGGER.debug('index')
     return bottle.template('index')
 
 @bottle.post('/')
@@ -105,12 +108,14 @@ def media(filename):
     return bottle.static_file(filename, root=MEDIA)
 
 @bottle.get('/about')
+@lru_cache(2)
 def about():
     """about page"""
     views = os.path.join(PROJECT_PATH, 'views')
     return bottle.static_file("about.html", root=views)
 
 @bottle.get('/qrcode/<code>')
+@lru_cache(128)
 def getqrcode(code):
     """get QRcode"""
     if not bottle.request.query.d:

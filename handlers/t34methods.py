@@ -13,6 +13,7 @@ from handlers.settings import ALPHABET, FREE_ATTEMPS, DEBUG, MAX_WAITING_LOCK, L
 from urllib.parse import urlparse, urlunparse, quote
 from handlers.t34base import MongodbBase, T34GenExt, mongo_required
 from pymongo.errors import ConnectionFailure, DuplicateKeyError
+from functools import lru_cache
 
 # try:
 #     from urllib.parse import urlparse, urlunparse, quote
@@ -135,6 +136,7 @@ class T34Url(MongodbBase):
         return self._id
 
     @staticmethod
+    @lru_cache(128)
     def t34_decode(xsource, basis=BAS_LEN):
         """Convert any number basis-based to decimal:
 
@@ -151,6 +153,7 @@ class T34Url(MongodbBase):
         return result
 
     @staticmethod
+    @lru_cache(128)
     def t34_encode(xsource, basis=BAS_LEN):
         """Convert any number from decimal to basis-based
 

@@ -9,6 +9,7 @@ from pymongo import MongoReplicaSetClient, MongoClient
 from pymongo.errors import OperationFailure, ConnectionFailure
 from pymongo.read_preferences import ReadPreference
 import datetime
+from functools import lru_cache, wraps
 
 # ------------------------------+
 # Basic mongo connection class  |
@@ -102,18 +103,18 @@ class StripPathMiddleware(object):
 # ------------------------------+
 def debug_profiler(function):
     """used to get profilling data"""
+    @wraps(function)
     def wrapper(*args, **kwargs):
         """decorator wrapper"""
         start = datetime.datetime.now()
         result = function(*args, **kwargs)
         LOGGER.debug("Execution time of [{0}] = {1}\n".format(function.__name__, datetime.datetime.now() - start))
         return result
-    wrapper.__name__ = function.__name__
-    wrapper.__doc__ = function.__doc__
     return wrapper
 
 def mongo_required(function):
     """validates mongo connection, applicable only for MongodbBase objects"""
+    @wraps(function)
     def wrapper(*args, **kwargs):
         """internal wrapper"""
         this = args[0]
@@ -121,13 +122,12 @@ def mongo_required(function):
             LOGGER.error("can not connect to MongoDB")
             raise MongoEx()
         return function(*args, **kwargs)
-    wrapper.__name__ = function.__name__
-    wrapper.__doc__ = function.__doc__
     return wrapper
 
 # ------------------------------+
 # Methods                       |
 # ------------------------------+
+@lru_cache(32)
 def std_decode(xsource, basis):
     """standart python converter any number basis-based to decimal"""
     if basis <= 36:
