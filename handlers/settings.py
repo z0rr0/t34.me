@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
-"""Main configuration"""
+"""Main configuration file"""
 
 import os
 import logging.config
@@ -69,28 +69,39 @@ else:
 
 LOGGER.debug("mongo_db={0}".format(DB['database']))
 
+
+# Main storage
+# ------------
 # db.urls = {
-#     "_id": 3244,                                          # _id => decode alphabet syms
-#      "hash": "4a8a9fc31dc15a4b87bb145b05db3ae0bf2333e4"   # url sha1 hash
-#     "inaddr": "https://www.google.ru/search?q=я"          # input url
-#     "outaddr": "https://www.google.ru/search?q=%D1%8F"    # converted url
-#     "counter": 2,                                         # increment counter of requests
-#     "created": date1,                                     # creation datetime
-#     "lastreq": date2,                                     # last request datetime
-#     "creator": {
-#       "raddr": "192.168.0.1",
-#       "rroute": ["192.168.0.1"],
-#       "method": "GET",
-#       "api": false,
-#   }
+#   "_id" : 111,                                          # decode alphabet syms
+#   "counter" : 1,                                        # url sha1 hash
+#   "created" : ISODate("2013-12-11T10:09:08.765Z"),      # timestamp of creation
+#   "creator" : {                                         # meta info about creator
+#     "rroute" : [                                        # remote route
+#       "127.0.0.1"
+#     ],
+#     "raddr" : "127.0.0.1",                              # remote IP address
+#     "api" : false,                                      # API is used
+#     "method" : "POST"                                   # HTTP method
+#   },
+#   "hash" : "4ef30e9f2fb32bc91fb1c0b5163e5d9b47bea1f0",  # url sha1 hash
+#   "inaddr" : "http://t34.me",                           # input url
+#   "lastreq" : ISODate("2014-11-10T09:08:07.654Z"),      # lastest request datetime
+#   "outaddr" : "http://t34.me"                           # output (converted) url
 # }
+
+# Indexes:
 # db.urls.ensureIndex({"hash": 1}, {"unique": 1})
 # db.urls.ensureIndex({"lastreq": 1, "created": 1})
 # db.urls.ensureIndex({"counter": -1})
 
+# Storage for a lock
+# ------------
 # db.locks = {
-#     "_id": 1,
-#     "threading": 3492394756                               # parent class ID
-#     "status": date3                                       # date of creation
+#     "_id": 1,                                           # id is always 1
+#     "threading": 3492394756                             # parent class ID
+#     "status": ISODate("2014-10-10T09:08:07.654Z")       # date of creation
 # }
+
+# Indexes:
 # db.locks.ensureIndex({"status": 1}, {expireAfterSeconds: 30})
