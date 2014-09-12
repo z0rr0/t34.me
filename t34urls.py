@@ -17,7 +17,6 @@ from functools import lru_cache
 @lru_cache(2)
 def index():
     """index page"""
-    # LOGGER.debug('index')
     return bottle.template('index')
 
 @bottle.post('/')
@@ -48,7 +47,6 @@ def result():
 @bottle.get('/<link:re:[0-9a-zA-Z]+>')
 def prepare(link):
     """return sreal URL by a short one"""
-    LOGGER.debug(link)
     try:
         obj = T34Url(link)
         if obj:
