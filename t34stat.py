@@ -68,7 +68,7 @@ def counter_stat(num, start):
     if results.count():
         print("Top:")
     for res in results:
-        print(i, template.format(res["_id"], res["counter"], res["creator"]["raddr"], res["lastreq"], res["created"], res["creator"]["api"], T34Url.t34_encode(res["_id"]), PREFIX))
+        print(i, template.format(res["_id"], res["counter"], res["creator"].get("raddr"), res["lastreq"], res["created"], res["creator"].get("api"), T34Url.t34_encode(res["_id"]), PREFIX))
         i += 1
     return 0
 

@@ -245,7 +245,8 @@ class T34Url(MongodbBase):
                     'counter': 0,
                     'created': now,
                     'lastreq': now,
-                    'outaddr': self.url_prepare(full_url)
+                    'outaddr': self.url_prepare(full_url),
+                    'creator': {'api': False, 'method': None, 'raddr': None, 'rroute': None}
                 }
                 created = self._col.insert(obj)
                 if created:
@@ -277,7 +278,8 @@ class T34Url(MongodbBase):
                     'counter': 0,
                     'created': now,
                     'lastreq': now,
-                    'outaddr': self.url_prepare(full_url)
+                    'outaddr': self.url_prepare(full_url),
+                    'creator': {'api': False, 'method': None, 'raddr': None, 'rroute': None}
                 }
                 created = self._col.insert(obj)
                 if created:
@@ -333,10 +335,16 @@ class T34Url(MongodbBase):
         LOGGER.debug("item not found")
         return False
 
-    def complement(self, compl_data):
+    def complement(self, request, api=False):
         """set additional info for an item"""
         if self._id:
             try:
+                compl_data = {
+                    "api": api,
+                    "method": request.method,
+                    "raddr": request.remote_addr,
+                    "rroute": request.remote_route
+                }
                 result = self._col.update({"_id": self._id}, {"$set": {"creator": compl_data}})
                 if result["updatedExisting"]:
                     # self.refresh()

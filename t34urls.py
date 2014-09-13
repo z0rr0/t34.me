@@ -33,12 +33,7 @@ def result():
             raise T34GenExt()
         result_link = PREFIX + returned_link
         if obj.newest:
-            obj.complement({
-                "api": False,
-                "method": bottle.request.method,
-                "raddr": bottle.request.remote_addr,
-                "rroute": bottle.request.remote_route
-            })
+            obj.complement(bottle.request, False)
     except (T34GenExt, MongoEx) as err:
         LOGGER.warning(err)
         raise bottle.HTTPError(500)
@@ -74,12 +69,7 @@ def api():
                 raise T34GenExt()
             result_link = PREFIX + returned_link
             if obj.newest:
-                obj.complement({
-                    "api": True,
-                    "method": bottle.request.method,
-                    "raddr": bottle.request.remote_addr,
-                    "rroute": bottle.request.remote_route
-                })
+                obj.complement(bottle.request, True)
             if bottle.request.query.web:
                 return bottle.template('result', var=result_link, dirty=returned_link)
         except (T34GenExt, MongoEx) as err:
