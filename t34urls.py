@@ -45,6 +45,7 @@ def result():
     return bottle.template('result', var=result_link, dirty=returned_link)
 
 @bottle.get('/<link:re:[0-9a-zA-Z]+>')
+@lru_cache(128)
 def prepare(link):
     """return sreal URL by a short one"""
     try:
@@ -90,12 +91,14 @@ def api():
         bottle.redirect("/")
 
 @bottle.error(404)
+@lru_cache(2)
 def error404(error):
     """HTTP error 404"""
     LOGGER.debug(error.status)
     return bottle.template('404')
 
 @bottle.error(500)
+@lru_cache(2)
 def error500(error):
     """HTTP error 500"""
     LOGGER.debug(error.status)
