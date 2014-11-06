@@ -31,17 +31,7 @@ METRIKA = ""
 PROJECT_PATH = os.path.join(os.path.realpath(os.path.dirname(__file__)), "..")
 MEDIA = os.path.join(PROJECT_PATH, 'media')
 LOGGING_CFG = 'logging.json'
-LOGGING_FILE = '/tmp/t34.me.log'
-LOGGING_CFG_PATH = os.path.join(PROJECT_PATH, 'configs', LOGGING_CFG)
-
-assert os.path.isfile(LOGGING_CFG_PATH)
-
-LOGGING_CFG = {}
-with open(LOGGING_CFG_PATH, 'r') as logging_fd:
-    LOGGING_CFG = load(logging_fd)
-    LOGGING_CFG['handlers']['file']['filename'] = LOGGING_FILE
-
-logging.config.dictConfig(LOGGING_CFG)
+LOGGING_FILE = '/tmp/MY_SITE_NAME.log'
 
 ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 SIMPLE_ALPHABET = '0123456789abcdefghijkmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ'
@@ -58,9 +48,20 @@ STAT_DAYS = 7
 # rewrite global setting vars
 # Define in local_settings: DB, DEBUG, PREFIX, ADMIN
 try:
-    from handlers.local_settings import DB, DEBUG, PREFIX, ADMIN, PRODUCTION
+    from handlers.local_settings import DB, DEBUG, PREFIX, ADMIN, PRODUCTION, LOGGING_FILE
 except ImportError:
     print("Import error")
+
+LOGGING_CFG_PATH = os.path.join(PROJECT_PATH, 'configs', LOGGING_CFG)
+
+assert os.path.isfile(LOGGING_CFG_PATH)
+
+LOGGING_CFG = {}
+with open(LOGGING_CFG_PATH, 'r') as logging_fd:
+    LOGGING_CFG = load(logging_fd)
+    LOGGING_CFG['handlers']['file']['filename'] = LOGGING_FILE
+
+logging.config.dictConfig(LOGGING_CFG)
 
 if DEBUG:
     LOGGER = logging.getLogger('debugMode')
@@ -85,9 +86,9 @@ LOGGER.debug("mongo_db={0}".format(DB['database']))
 #     "method" : "POST"                                   # HTTP method
 #   },
 #   "hash" : "4ef30e9f2fb32bc91fb1c0b5163e5d9b47bea1f0",  # url sha1 hash
-#   "inaddr" : "http://t34.me",                           # input url
+#   "inaddr" : "PREFIX",                                  # input url
 #   "lastreq" : ISODate("2014-11-10T09:08:07.654Z"),      # lastest request datetime
-#   "outaddr" : "http://t34.me"                           # output (converted) url
+#   "outaddr" : "PREFIX"                                  # output (converted) url
 # }
 
 # Indexes:
