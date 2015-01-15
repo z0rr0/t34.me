@@ -227,12 +227,25 @@ class T34Url(MongodbBase):
             return self.t34_encode(self._id)
         return None
 
+    @mongo_required
+    def _find_by_hash(self, uhash, outaddr):
+        """
+            finds a link if it exists in database
+            finds items by a hash and checks possible collisions
+        """
+        for item in self._col.find({"hash": uhash}).sort([("created", -1)]):
+            if outaddr == item.get("outaddr"):
+                return item
+        return None
+
     def _create_free(self, full_url):
         """Adds new url to DB storage, in free mode."""
         uhash = hashlib.sha1(full_url.encode("utf-8")).hexdigest()
-        created = False
+        created, outaddr = False, self.url_prepare(full_url)
+        if not outaddr:
+            raise T34GenExt()
         for i in range(FREE_ATTEMPS):
-            already = self._col.find_one({"hash": uhash})
+            already = self._find_by_hash(uhash, outaddr)
             if already:
                 self._id, self._data = already["_id"], already
                 return True
@@ -245,7 +258,7 @@ class T34Url(MongodbBase):
                     'counter': 0,
                     'created': now,
                     'lastreq': now,
-                    'outaddr': self.url_prepare(full_url),
+                    'outaddr': outaddr,
                     'creator': {'api': False, 'method': None, 'raddr': None, 'rroute': None}
                 }
                 created = self._col.insert(obj)

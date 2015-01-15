@@ -92,7 +92,7 @@ LOGGER.debug("mongo_db={0}".format(DB['database']))
 # }
 
 # Indexes:
-# db.urls.ensureIndex({"hash": 1}, {"unique": 1})
+# db.urls.ensureIndex({"hash": 1, "created": -1})
 # db.urls.ensureIndex({"lastreq": 1, "created": 1})
 # db.urls.ensureIndex({"counter": -1})
 
