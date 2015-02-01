@@ -37,12 +37,12 @@
   "loggers": {
     "debugMode":  {
       "level": "DEBUG",
-      "handlers": ["file", "email"],
+      "handlers": ["file"],
       "propagate": "no"
     },
     "rpoductionMode": {
       "level": "WARNING",
-      "handlers": ["file"],
+      "handlers": ["file", "email"],
       "propagate": "yes"
     }
   },
