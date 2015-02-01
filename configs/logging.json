@@ -24,12 +24,20 @@
       "level": "DEBUG",
       "formatter": "simple",
       "stream": "ext://sys.stdout"
+    },
+    "email": {
+      "class": "logging.handlers.SMTPHandler",
+      "level": "DEBUG",
+      "mailhost": "localhost",
+      "fromaddr": "admin@t34.me",
+      "toaddrs": ["admin@t34.me"],
+      "subject": "Notification from t34.me"
     }
   },
   "loggers": {
     "debugMode":  {
       "level": "DEBUG",
-      "handlers": ["file"],
+      "handlers": ["file", "email"],
       "propagate": "no"
     },
     "rpoductionMode": {

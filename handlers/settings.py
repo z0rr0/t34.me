@@ -44,13 +44,15 @@ MAX_WAITING_LOCK = 20
 FREE_ATTEMPS = 3
 # days for statistics
 STAT_DAYS = 7
+# old configuration
+# BOOTSTRAP_CSS = "/media/bootstrap/css/bootstrap.min.css"
 
 # rewrite global setting vars
 # Define in local_settings: DB, DEBUG, PREFIX, ADMIN
 try:
-    from handlers.local_settings import DB, DEBUG, PREFIX, ADMIN, PRODUCTION, LOGGING_FILE
-except ImportError:
-    print("Import error")
+    from handlers.local_settings import DB, DEBUG, PREFIX, ADMIN, ADMINS, PRODUCTION, LOGGING_FILE
+except (ImportError,) as err:
+    print("Import error: {0}".format(err))
 
 LOGGING_CFG_PATH = os.path.join(PROJECT_PATH, 'configs', LOGGING_CFG)
 
@@ -60,6 +62,8 @@ LOGGING_CFG = {}
 with open(LOGGING_CFG_PATH, 'r') as logging_fd:
     LOGGING_CFG = load(logging_fd)
     LOGGING_CFG['handlers']['file']['filename'] = LOGGING_FILE
+    # email - https://docs.python.org/3/library/logging.config.html#module-logging.config
+    LOGGING_CFG['handlers']['email']['toaddrs'] = ADMINS
 
 logging.config.dictConfig(LOGGING_CFG)
 

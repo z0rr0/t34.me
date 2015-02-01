@@ -7,7 +7,7 @@
     <meta name="description" content="short urls">
     <meta name="author" content="tank@t34.me">
     <!-- CSS -->
-    <link href="/media/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=PT+Sans+Caption:400,700' rel='stylesheet' type='text/css'>
     <link href="/media/css/custom.css" rel="stylesheet">
   </head>
