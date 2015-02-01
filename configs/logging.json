@@ -27,7 +27,7 @@
     },
     "email": {
       "class": "logging.handlers.SMTPHandler",
-      "level": "DEBUG",
+      "level": "ERROR",
       "mailhost": "localhost",
       "fromaddr": "admin@t34.me",
       "toaddrs": ["admin@t34.me"],
