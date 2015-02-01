@@ -2,11 +2,11 @@
 #-*- coding: utf-8 -*-
 """This file contains base methods"""
 
-import datetime
-import time
-import hashlib
-import random
 import re
+import time
+import random
+import hashlib
+import datetime
 import threading
 
 from handlers.settings import ALPHABET, FREE_ATTEMPS, DEBUG, MAX_WAITING_LOCK, LOGGER, MIN_ID
@@ -22,6 +22,7 @@ from functools import lru_cache
 #     from urlparse import urlparse, urlunparse
 #     from urllib import quote
 
+MAXID = 2147483647
 T34DICT = ALPHABET # or SIMPLE_ALPHABET
 BAS_LEN = len(T34DICT)
 
@@ -40,6 +41,7 @@ class T34Lock(MongodbBase):
 
     @property
     def locks(self):
+        """returns lock collection"""
         return self._locks
 
     @mongo_required
@@ -84,7 +86,7 @@ class T34Url(MongodbBase):
         self._data, self._col, self._newest = None, None, False
         self._id = 0 if not shortID else self.t34_decode(shortID)
         self.init()
-        self.get_data()
+        # self.get_data() # can raise T34GenExt exception
 
     def __repr__(self):
         return "<t34: {0}>".format(self._id)
@@ -197,6 +199,8 @@ class T34Url(MongodbBase):
             self._col = self._database.urls
             if self._is_test:
                 self._col = self._database.tests
+            if self._id > MAXID:
+                raise T34GenExt("id={0} - OverflowError: MongoDB can only handle up to 8-byte ints (max={1})".format(self._id, MAXID))
             if self._id:
                 self._data = self._col.find_one({"_id": self._id})
             return 0

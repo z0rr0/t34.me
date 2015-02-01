@@ -45,6 +45,7 @@ def prepare(link):
     """return sreal URL by a short one"""
     try:
         obj = T34Url(link)
+        obj.get_data()
         if obj:
             obj.update()
             if obj.data.get('outaddr'):
