@@ -86,6 +86,8 @@ class T34Url(MongodbBase):
         self._data, self._col, self._newest = None, None, False
         self._id = 0 if not shortID else self.t34_decode(shortID)
         self.init()
+        if self.set_collections():
+            LOGGER.error("Can't set collections")
         # self.get_data() # can raise T34GenExt exception
 
     def __repr__(self):
@@ -192,19 +194,24 @@ class T34Url(MongodbBase):
             result = ""
         return result
 
-    # @mongo_required
-    def get_data(self):
-        """soft check of connection, w/o exception"""
+    def set_collections(self):
+        """set mongodb collections"""
         if self.connected:
-            self._col = self._database.urls
             if self._is_test:
                 self._col = self._database.tests
-            if self._id > MAXID:
-                raise T34GenExt("id={0} - OverflowError: MongoDB can only handle up to 8-byte ints (max={1})".format(self._id, MAXID))
-            if self._id:
-                self._data = self._col.find_one({"_id": self._id})
+            else:
+                self._col = self._database.urls
             return 0
         return 1
+
+    @mongo_required
+    def get_data(self):
+        """soft check of connection, w/o exception"""
+        if self._id > MAXID:
+            raise T34GenExt("id={0} - OverflowError: MongoDB can only handle up to 8-byte ints (max={1})".format(self._id, MAXID))
+        if self._id:
+            self._data = self._col.find_one({"_id": self._id})
+        return 0
 
     @mongo_required
     def clean(self):
