@@ -30,11 +30,14 @@ CACHE_DEFAULT = hashlib.sha1().hexdigest()
 
 URL_PREFIX = re.compile(r'^(.+)://', re.UNICODE)
 
-def upgrade1_conv(value):
+def upgrade1_conv(value, inv=False):
     """it convets old format to new one"""
     result = ""
     for val in value:
-        result += ALPHABET[OLD_ALPHABET.find(val)]
+        if inv:
+            result += OLD_ALPHABET[ALPHABET.find(val)]
+        else:
+            result += ALPHABET[OLD_ALPHABET.find(val)]
     return result
 
 # =========================== T34Lock ======================
@@ -281,7 +284,11 @@ class T34Url(MongodbBase):
         for i in range(FREE_ATTEMPS):
             already = self._find_by_hash(uhash, outaddr)
             if already:
-                self._id, self._data = already["_id"], already
+                if already["created"] < UPGRADE1:
+                    self._id = upgrade1_conv(already["_id"], True)
+                else:
+                    self._id = already["_id"]
+                self._data = already
                 return True
             now = datetime.datetime.utcnow()
             try:
