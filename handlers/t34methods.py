@@ -9,7 +9,7 @@ import hashlib
 import datetime
 import threading
 
-from handlers.settings import ALPHABET, FREE_ATTEMPS, DEBUG, MAX_WAITING_LOCK, LOGGER, MIN_ID
+from handlers.settings import ALPHABET, FREE_ATTEMPS, DEBUG, MAX_WAITING_LOCK, LOGGER, MIN_ID, OLD_ALPHABET
 from urllib.parse import urlparse, urlunparse, quote
 from handlers.t34base import MongodbBase, T34GenExt, mongo_required
 from pymongo.errors import ConnectionFailure, DuplicateKeyError
@@ -24,10 +24,18 @@ from functools import lru_cache
 
 T34DICT = ALPHABET # or SIMPLE_ALPHABET
 BAS_LEN = len(T34DICT)
+UPGRADE1 = datetime.datetime(2015, 2, 13, 22, 0)
 
 CACHE_DEFAULT = hashlib.sha1().hexdigest()
 
 URL_PREFIX = re.compile(r'^(.+)://', re.UNICODE)
+
+def upgrade1_conv(value):
+    """it convets old format to new one"""
+    result = ""
+    for val in value:
+        result += ALPHABET[OLD_ALPHABET.find(val)]
+    return result
 
 # =========================== T34Lock ======================
 class T34Lock(MongodbBase):
@@ -221,6 +229,9 @@ class T34Url(MongodbBase):
         """soft check of connection, w/o exception"""
         if self._id:
             self._data = self._col.find_one({"_id": self._id})
+            if self._data["created"] < UPGRADE1:
+                self._id = upgrade1_conv(self._id)
+                self._data = self._col.find_one({"_id": self._id})
         return 0
 
     @mongo_required
