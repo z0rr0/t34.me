@@ -37,7 +37,7 @@ ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 SIMPLE_ALPHABET = '0123456789abcdefghijkmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ'
 
 # IDs 1-99 are sererved for tests
-MIN_ID = 100
+MIN_ID = "1C"
 # waiting of unclock, seconds
 MAX_WAITING_LOCK = 20
 # max attemps free-add url

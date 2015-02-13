@@ -92,7 +92,7 @@ def test_obj_creation():
         assert result == ESTR
         assert obj.delete(None, None, test_url) == True
     except (AssertionError, T34GenExt) as err:
-        LOGGER.warning("Test '{0}' is not passed: {1}".format(test_name, err))
+        LOGGER.warning("Test '{0}' is not passed ({2}): {1}".format(test_name, err, result))
         return 1
     print("Test '{0}' is passed".format(test_name))
     return 0

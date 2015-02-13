@@ -22,7 +22,6 @@ from functools import lru_cache
 #     from urlparse import urlparse, urlunparse
 #     from urllib import quote
 
-MAXID = 2147483647
 T34DICT = ALPHABET # or SIMPLE_ALPHABET
 BAS_LEN = len(T34DICT)
 
@@ -84,7 +83,7 @@ class T34Url(MongodbBase):
         super(T34Url, self).__init__()
         self._is_test = is_test
         self._data, self._col, self._newest = None, None, False
-        self._id = 0 if not shortID else self.t34_decode(shortID)
+        self._id = 0 if not shortID else shortID
         self.init()
         if self.set_collections():
             LOGGER.error("Can't set collections")
@@ -139,6 +138,13 @@ class T34Url(MongodbBase):
     def id(self):
         return self._id
 
+    @property
+    def collection(self):
+        return self._col
+
+    def tt(self, a):
+        return self.inc_encode(a)
+
     @staticmethod
     @lru_cache(128)
     def t34_decode(xsource, basis=BAS_LEN):
@@ -171,6 +177,12 @@ class T34Url(MongodbBase):
             result = T34DICT[i] + result
             xsource = xsource // basis
         return result
+
+    # @lru_cache(128)
+    def inc_encode(self, hexval, basis=BAS_LEN):
+        """increases encoded to hex value"""
+        decoded = self.t34_decode(hexval, basis) + 1
+        return self.t34_encode(decoded, basis)
 
     @staticmethod
     def url_prepare(link):
@@ -207,8 +219,6 @@ class T34Url(MongodbBase):
     @mongo_required
     def get_data(self):
         """soft check of connection, w/o exception"""
-        if self._id > MAXID:
-            raise T34GenExt("id={0} - OverflowError: MongoDB can only handle up to 8-byte ints (max={1})".format(self._id, MAXID))
         if self._id:
             self._data = self._col.find_one({"_id": self._id})
         return 0
@@ -234,8 +244,9 @@ class T34Url(MongodbBase):
     @mongo_required
     def create(self, full_url):
         """try to add url id DB"""
-        if self._create_free(full_url):
-            return self.t34_encode(self._id)
+        if self._create_lock(full_url):
+            # return self.t34_encode(self._id)
+            return self._id
         return None
 
     @mongo_required
@@ -249,6 +260,7 @@ class T34Url(MongodbBase):
                 return item
         return None
 
+    # it isn't used now
     def _create_free(self, full_url):
         """Adds new url to DB storage, in free mode."""
         uhash = hashlib.sha1(full_url.encode("utf-8")).hexdigest()
@@ -288,9 +300,12 @@ class T34Url(MongodbBase):
     def _create_lock(self, full_url):
         """Creare a new url link in locked mode."""
         with T34Lock(self._is_test):
-            uhash = hashlib.sha1(full_url.encode("utf-8")).hexdigest()
+            created, outaddr = False, self.url_prepare(full_url)
+            uhash = hashlib.sha1(outaddr.encode("utf-8")).hexdigest()
+            if not outaddr:
+                raise T34GenExt()
             try:
-                already = self._col.find_one({"hash": uhash})
+                already = self._find_by_hash(uhash, outaddr)
                 if already:
                     self._id, self._data = already["_id"], already
                     return True
@@ -302,7 +317,7 @@ class T34Url(MongodbBase):
                     'counter': 0,
                     'created': now,
                     'lastreq': now,
-                    'outaddr': self.url_prepare(full_url),
+                    'outaddr': outaddr,
                     'creator': {'api': False, 'method': None, 'raddr': None, 'rroute': None}
                 }
                 created = self._col.insert(obj)
@@ -332,18 +347,18 @@ class T34Url(MongodbBase):
         return False
 
     def _get_max(self):
-        """gets max ID number+1"""
-        result = 10 if DEBUG else MIN_ID
+        """gets max ID number+1, uses hex-id"""
+        result = "a" if DEBUG else MIN_ID
         try:
-            max_val = self._col.aggregate({"$group": {"_id": "max", "val": {"$max": "$_id"}}})
-            if max_val.get('ok') != 1:
-                raise T34GenExt()
-            if max_val.get('result') and max_val["result"][0]["val"]:
-                result = result if max_val["result"][0]["val"] < result else max_val["result"][0]["val"]
-        except (ConnectionFailure, AttributeError, IndexError) as err:
+            max_val = self._col.find({}, {"_id": 1}).sort([("_id", -1)]).limit(1)[0]
+            if result <= max_val.get("_id"):
+                result = max_val.get("_id")
+        except (IndexError,) as err1:
+            pass
+        except (ConnectionFailure, AttributeError,) as err:
             LOGGER.error(err)
             raise T34GenExt()
-        return result + 1
+        return self.inc_encode(result)
 
     def update(self):
         """update existed data"""
@@ -378,3 +393,13 @@ class T34Url(MongodbBase):
                 LOGGER.error(err)
                 raise T34GenExt()
         return False
+
+    @mongo_required
+    def upgrade(self, cond, data, test=True):
+        """upgrade data, only for tests"""
+        if test:
+            return self._col.find(cond).count()
+        result = self._col.update(cond, data, multi=True)
+        if result.get("ok"):
+            return result.get("n")
+        return None
