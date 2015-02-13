@@ -9,7 +9,7 @@ import asyncio
 import hashlib
 
 @asyncio.coroutine
-def sync_handler_num2strng(obj, item, test):
+def sync_handler_num2str(obj, item, test):
     """upgrade operation"""
     oldid = item.get("_id")
     item["_id"] = obj.t34_encode(int(oldid))
@@ -32,7 +32,7 @@ def num2strng(test=True):
         for item in obj.collection.find({}):
             num = item.get("_id")
             if type(num) in (int, float):
-                tasks.append(asyncio.async(sync_handler_num2strng(obj, item, test)))
+                tasks.append(asyncio.async(sync_handler_num2str(obj, item, test)))
         LOGGER.debug("{0} tasks should be handled".format(len(tasks)))
         if tasks:
             loop.run_until_complete(asyncio.wait(tasks))
