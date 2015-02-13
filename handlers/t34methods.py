@@ -325,7 +325,11 @@ class T34Url(MongodbBase):
             try:
                 already = self._find_by_hash(uhash, outaddr)
                 if already:
-                    self._id, self._data = already["_id"], already
+                    if already["created"] < UPGRADE1:
+                        self._id = upgrade1_conv(already["_id"], True)
+                    else:
+                        self._id = already["_id"]
+                    self._data = already
                     return True
                 now = datetime.datetime.utcnow()
                 obj = {
