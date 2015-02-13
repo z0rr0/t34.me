@@ -33,8 +33,8 @@ MEDIA = os.path.join(PROJECT_PATH, 'media')
 LOGGING_CFG = 'logging.json'
 LOGGING_FILE = '/tmp/MY_SITE_NAME.log'
 
-ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-SIMPLE_ALPHABET = '0123456789abcdefghijkmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ'
+ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+SIMPLE_ALPHABET = '0123456789ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz'
 
 # IDs 1-99 are sererved for tests
 MIN_ID = "1C"

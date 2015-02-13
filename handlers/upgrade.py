@@ -22,7 +22,7 @@ def sync_handler_num2str(obj, item, test):
             LOGGER.warning("not updated? old={0}, new={1}".format(oldid, item["_id"]))
     LOGGER.debug("old={0}, new={1}".format(oldid, item["_id"]))
 
-def num2strng(test=True):
+def num2str(test=True):
     """Upgrade numeric ID to string-based values"""
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
