@@ -101,7 +101,7 @@ LOGGER.debug("mongo_db={0}".format(DB['database']))
 # db.urls.ensureIndex({"hash": 1, "created": -1})
 # db.urls.ensureIndex({"lastreq": 1, "created": 1})
 # db.urls.ensureIndex({"counter": -1})
-# db.urls.ensureIndex({"old": 1})
+# db.urls.ensureIndex({"old": 1}, {unique: true, sparse: true})
 
 # Storage for a lock
 # ------------
