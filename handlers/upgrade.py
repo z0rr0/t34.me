@@ -74,7 +74,7 @@ def save_upgrade1(test=True):
     asyncio.set_event_loop(loop)
     obj = T34Url()
     try:
-        for item in obj.collection.find({"old": {"$exists": False}, "created": {"lt": UPGRADE1}}):
+        for item in obj.collection.find({"old": {"$exists": False}, "created": {"$lt": UPGRADE1}}):
             if item.get("created"):
                 tasks.append(asyncio.async(sync_handler_save_upgrade1(obj, item, test)))
         LOGGER.debug("{0} tasks should be handled".format(len(tasks)))
