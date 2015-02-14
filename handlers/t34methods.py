@@ -217,10 +217,17 @@ class T34Url(MongodbBase):
         """soft check of connection, w/o exception"""
         if self._id:
             self._data = self._col.find_one({"_id": self._id})
-            if self._data.get("old"):
-                self._old = self._id
-                self._id = self._data.get("old")
-                self._data = self._col.find_one({"_id": self._id})
+            if self._data:
+                if self._data.get("old"):
+                    self._old = self._id
+                    self._id = self._data.get("old")
+                    self._data = self._col.find_one({"_id": self._id})
+            else:
+                # try find by old
+                self._data = self._col.find_one({"old": self._id})
+                if self._data:
+                    self._id = self._data.get("_id")
+                    self._old = self._data.get("old")
         return 0
 
     @mongo_required
