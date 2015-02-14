@@ -9,7 +9,7 @@ import hashlib
 import datetime
 import threading
 
-from handlers.settings import ALPHABET, FREE_ATTEMPS, DEBUG, MAX_WAITING_LOCK, LOGGER, MIN_ID, OLD_ALPHABET
+from handlers.settings import ALPHABET, FREE_ATTEMPS, DEBUG, MAX_WAITING_LOCK, LOGGER, MIN_ID
 from urllib.parse import urlparse, urlunparse, quote
 from handlers.t34base import MongodbBase, T34GenExt, mongo_required
 from pymongo.errors import ConnectionFailure, DuplicateKeyError
@@ -24,21 +24,9 @@ from functools import lru_cache
 
 T34DICT = ALPHABET # or SIMPLE_ALPHABET
 BAS_LEN = len(T34DICT)
-UPGRADE1 = datetime.datetime(2015, 2, 13, 22, 0)
-
 CACHE_DEFAULT = hashlib.sha1().hexdigest()
-
 URL_PREFIX = re.compile(r'^(.+)://', re.UNICODE)
 
-def upgrade1_conv(value, inv=False):
-    """it convets old format to new one"""
-    result = ""
-    for val in value:
-        if inv:
-            result += OLD_ALPHABET[ALPHABET.find(val)]
-        else:
-            result += ALPHABET[OLD_ALPHABET.find(val)]
-    return result
 
 # =========================== T34Lock ======================
 class T34Lock(MongodbBase):
@@ -93,7 +81,7 @@ class T34Url(MongodbBase):
     def __init__(self, shortID=None, is_test=False):
         super(T34Url, self).__init__()
         self._is_test = is_test
-        self._data, self._col, self._newest = None, None, False
+        self._data, self._col, self._newest, self._old = None, None, False, None
         self._id = 0 if not shortID else shortID
         self.init()
         if self.set_collections():
@@ -152,9 +140,6 @@ class T34Url(MongodbBase):
     @property
     def collection(self):
         return self._col
-
-    def tt(self, a):
-        return self.inc_encode(a)
 
     @staticmethod
     @lru_cache(128)
@@ -232,8 +217,9 @@ class T34Url(MongodbBase):
         """soft check of connection, w/o exception"""
         if self._id:
             self._data = self._col.find_one({"_id": self._id})
-            if self._data["created"] < UPGRADE1:
-                self._id = upgrade1_conv(self._id)
+            if self._data.get("old"):
+                self._old = self._id
+                self._id = self._data.get("old")
                 self._data = self._col.find_one({"_id": self._id})
         return 0
 
@@ -259,8 +245,7 @@ class T34Url(MongodbBase):
     def create(self, full_url):
         """try to add url id DB"""
         if self._create_lock(full_url):
-            # return self.t34_encode(self._id)
-            return self._id
+            return self._old if self._old else self._id
         return None
 
     @mongo_required
@@ -284,10 +269,8 @@ class T34Url(MongodbBase):
         for i in range(FREE_ATTEMPS):
             already = self._find_by_hash(uhash, outaddr)
             if already:
-                if already["created"] < UPGRADE1:
-                    self._id = upgrade1_conv(already["_id"], True)
-                else:
-                    self._id = already["_id"]
+                self._id = already.get("id")
+                self._old = already.get("old")
                 self._data = already
                 return True
             now = datetime.datetime.utcnow()
@@ -325,10 +308,8 @@ class T34Url(MongodbBase):
             try:
                 already = self._find_by_hash(uhash, outaddr)
                 if already:
-                    if already["created"] < UPGRADE1:
-                        self._id = upgrade1_conv(already["_id"], True)
-                    else:
-                        self._id = already["_id"]
+                    self._id = already.get("id")
+                    self._old = already.get("old")
                     self._data = already
                     return True
                 now = datetime.datetime.utcnow()
@@ -376,7 +357,7 @@ class T34Url(MongodbBase):
             if result <= max_val.get("_id"):
                 result = max_val.get("_id")
         except (IndexError,) as err1:
-            pass
+            LOGGER.debug(err1)
         except (ConnectionFailure, AttributeError,) as err:
             LOGGER.error(err)
             raise T34GenExt()
@@ -386,7 +367,10 @@ class T34Url(MongodbBase):
         """update existed data"""
         if self._id:
             try:
-                result = self._col.update({"_id": self._id}, {"$set": {"lastreq": datetime.datetime.utcnow()}, "$inc": {"counter": 1}})
+                cond = {"_id": self._id}
+                if self._old:
+                    cond = {"old": self._id}
+                result = self._col.update(cond, {"$set": {"lastreq": datetime.datetime.utcnow()}, "$inc": {"counter": 1}})
                 if result["updatedExisting"]:
                     self.refresh()
                     return True

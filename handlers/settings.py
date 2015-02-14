@@ -94,12 +94,14 @@ LOGGER.debug("mongo_db={0}".format(DB['database']))
 #   "inaddr" : "PREFIX",                                  # input url
 #   "lastreq" : ISODate("2014-11-10T09:08:07.654Z"),      # lastest request datetime
 #   "outaddr" : "PREFIX"                                  # output (converted) url
+#   "old" : "oldID"                                       # oldID before upgrade (optional)
 # }
 
 # Indexes:
 # db.urls.ensureIndex({"hash": 1, "created": -1})
 # db.urls.ensureIndex({"lastreq": 1, "created": 1})
 # db.urls.ensureIndex({"counter": -1})
+# db.urls.ensureIndex({"old": 1})
 
 # Storage for a lock
 # ------------
