@@ -315,7 +315,7 @@ class T34Url(MongodbBase):
             try:
                 already = self._find_by_hash(uhash, outaddr)
                 if already:
-                    self._id = already.get("id")
+                    self._id = already.get("_id")
                     self._old = already.get("old")
                     self._data = already
                     return True
