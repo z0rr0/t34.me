@@ -29,11 +29,19 @@ class MongodbBase(object):
     def _connect(self):
         """mongodb connect"""
         cfg = DB.get("REPLICA")
+        ssl = DB.get("SSL")
         try:
-            if cfg:
-                self._connection = MongoReplicaSetClient(host=cfg["host"], port=cfg["port"], replicaSet=cfg["id"], read_preference=ReadPreference.SECONDARY_PREFERRED)
+            if ssl:
+                if cfg:
+                    self._connection = MongoReplicaSetClient(host=cfg["host"], ssl=True, ssl_certfile=ssl.get("ssl_certfile"), port=cfg["port"], replicaSet=cfg["id"], read_preference=ReadPreference.SECONDARY_PREFERRED)
+                else:
+                    self._connection = MongoClient(host=DB['host'], port=DB['port'], ssl=True, ssl_certfile=ssl.get("ssl_certfile"), read_preference=ReadPreference.PRIMARY)
+                LOGGER.debug("MongoDB SSL enabled")
             else:
-                self._connection = MongoClient(host=DB['host'], port=DB['port'], read_preference=ReadPreference.PRIMARY)
+                if cfg:
+                    self._connection = MongoReplicaSetClient(host=cfg["host"], port=cfg["port"], replicaSet=cfg["id"], read_preference=ReadPreference.SECONDARY_PREFERRED)
+                else:
+                    self._connection = MongoClient(host=DB['host'], port=DB['port'], read_preference=ReadPreference.PRIMARY)
             authdb = DB.get('authdb', DB["database"])
             self._database = self._connection[DB["database"]]
             if not self._database.authenticate(DB['user'], DB['password'], source=authdb):
