@@ -7,7 +7,7 @@ import bottle
 import qrcode
 
 from handlers.settings import LOGGER, PROJECT_PATH, PRODUCTION, MEDIA, PREFIX
-from handlers.t34base import T34GenExt, MongoEx, StripPathMiddleware #, debug_profiler
+from handlers.t34base import T34GenExt, MongoEx, StripPathMiddleware
 from handlers.t34methods import T34Url
 
 from io import BytesIO

@@ -22,7 +22,8 @@ from functools import lru_cache
 #     from urlparse import urlparse, urlunparse
 #     from urllib import quote
 
-T34DICT = ALPHABET # or SIMPLE_ALPHABET
+# or SIMPLE_ALPHABET
+T34DICT = ALPHABET
 BAS_LEN = len(T34DICT)
 CACHE_DEFAULT = hashlib.sha1().hexdigest()
 URL_PREFIX = re.compile(r'^(.+)://', re.UNICODE)
@@ -153,7 +154,7 @@ class T34Url(MongodbBase):
         i, result = 0, 0
         syms = str(xsource)
         while syms:
-            result += T34DICT.index(syms[-1]) * (basis**i)
+            result += T34DICT.index(syms[-1]) * (basis ** i)
             syms = syms[:-1]
             i += 1
         return result

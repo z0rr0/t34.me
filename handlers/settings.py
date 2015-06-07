@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Main configuration file"""
 
 import os
@@ -51,7 +51,7 @@ STAT_DAYS = 7
 # rewrite global setting vars
 # Define in local_settings: DB, DEBUG, PREFIX, ADMIN
 try:
-    from handlers.local_settings import DB, DEBUG, PREFIX, ADMIN, ADMINS, PRODUCTION, LOGGING_FILE
+    from handlers.local_settings import DB, DEBUG, PREFIX, ADMINS, PRODUCTION, LOGGING_FILE
 except (ImportError,) as err:
     print("Import error: {0}".format(err))
 
