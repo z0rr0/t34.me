@@ -8,6 +8,7 @@ from handlers.settings import LOGGER, DB
 from pymongo import MongoReplicaSetClient, MongoClient
 from pymongo.errors import OperationFailure, ConnectionFailure
 from pymongo.read_preferences import ReadPreference
+from pymongo.ssl_support import ssl as pymssl
 import datetime
 from functools import lru_cache, wraps
 
@@ -35,9 +36,10 @@ class MongodbBase(object):
                 LOGGER.debug("MongoDB SSL enabled")
                 if cfg:
                     LOGGER.debug("MongoDB Replica enabled")
-                    self._connection = MongoReplicaSetClient(host=cfg["host"], ssl=True, ssl_certfile=ssl.get("ssl_certfile"), port=cfg["port"], replicaSet=cfg["id"], read_preference=ReadPreference.SECONDARY_PREFERRED)
+                    self._connection = MongoReplicaSetClient(host=cfg["host"], ssl=True, ssl_certfile=ssl.get("ssl_certfile"), ssl_cert_reqs=pymssl.CERT_REQUIRED, ssl_ca_certs=ssl.get("ssl_certfile"), port=cfg["port"], replicaSet=cfg["id"], read_preference=ReadPreference.SECONDARY_PREFERRED)
                 else:
-                    self._connection = MongoClient(host=DB['host'], port=DB['port'], ssl=True, ssl_certfile=ssl.get("ssl_certfile"), read_preference=ReadPreference.PRIMARY)
+                    # default production configuration
+                    self._connection = MongoClient(host=DB['host'], port=DB['port'], ssl=True, ssl_certfile=ssl.get("ssl_certfile"), ssl_cert_reqs=pymssl.CERT_REQUIRED, ssl_ca_certs=ssl.get("ssl_certfile"), read_preference=ReadPreference.PRIMARY)
             else:
                 if cfg:
                     LOGGER.debug("MongoDB Replica enabled")
@@ -57,7 +59,7 @@ class MongodbBase(object):
     @property
     def connected(self):
         """returns connect boolean value"""
-        return self._connection.alive() if self._connection else False
+        return True if self._connection else False
 
     @property
     def database(self):
@@ -68,7 +70,7 @@ class MongodbBase(object):
         """close mongodb connection"""
         if self.connected:
             try:
-                self._database.connection.close()
+                self._connection.close()
             except (AttributeError, OperationFailure, ConnectionFailure) as err:
                 LOGGER.warning(err)
             self._connected = False

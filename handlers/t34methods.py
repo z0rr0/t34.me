@@ -52,7 +52,7 @@ class T34Lock(MongodbBase):
         thread = threading.currentThread().ident
         while now() < end_time:
             try:
-                lock = self._locks.insert({"_id": 1, "thread": thread, "status": now()})
+                lock = self._locks.insert_one({"_id": 1, "thread": thread, "status": now()})
                 if lock:
                     LOGGER.debug("Lock: id={0}".format(lock))
                     return 0
